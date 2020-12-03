@@ -1,4 +1,4 @@
-FROM ursais:ubuntu-20.04
+FROM ursa/ubuntu-20.04:latest
 MAINTAINER Open Source Integrators <contact@opensourceintegrators.com>
 
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf

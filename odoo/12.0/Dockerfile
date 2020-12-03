@@ -1,4 +1,4 @@
-FROM ursais:ubuntu-18.04
+FROM ursa/ubuntu-18.04:latest
 MAINTAINER Open Source Integrators <contact@opensourceintegrators.com>
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
