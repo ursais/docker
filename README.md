@@ -25,6 +25,10 @@ This repository contains Dockerfile files used to build solutions provided by
 * [13.0](odoo/13.0/Dockerfile)
 * [14.0](odoo/14.0/Dockerfile)
 
+## PostgreSQL
+
+* [13.0](postgresql/13.0/Dockerfile)
+
 ## Red Hat
 
 * [8](redhat/8/Dockerfile)
@@ -37,4 +41,4 @@ This repository contains Dockerfile files used to build solutions provided by
 ## Support
 
 Report any problem or question by creating an issue on the
-[GitHub](https://github.com/ursais/dockers/issues) project.
+[GitHub project](https://github.com/ursais/docker/issues).
