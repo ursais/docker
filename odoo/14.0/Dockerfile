@@ -22,6 +22,7 @@ RUN apt-get update \
         python3-slugify \
         python3-vobject \
         python3-watchdog \
+        python3-wheel \
         python3-xlrd \
         python3-xlwt \
         xz-utils \
@@ -44,13 +45,10 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main' > /etc/a
     && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
-# Install rtlcss (on Debian buster)
-RUN npm install -g rtlcss
-
 # Install Odoo
 ENV ODOO_VERSION 14.0
-ARG ODOO_RELEASE=20201123
-ARG ODOO_SHA=bbcefc0cd5b5aa2285a577118f918742bac670c4
+ARG ODOO_RELEASE=20201204
+ARG ODOO_SHA=dad3d9fef21bf21802363785140f3a8865d42060
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
     && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
     && apt-get update \
@@ -70,6 +68,8 @@ VOLUME ["/var/lib/odoo"]
 
 # Expose Odoo services
 EXPOSE 8069 8072
+
+RUN pip3 install -r /odoo/requirements.txt
 
 RUN chown -R odoo /etc/odoo /mnt/extra-addons /odoo
 
