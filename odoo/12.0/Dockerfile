@@ -1,11 +1,6 @@
 FROM ursa/ubuntu-18.04:latest
 MAINTAINER Open Source Integrators <contact@opensourceintegrators.com>
 
-SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
-
-# Generate locale C.UTF-8 for postgres and general locale data
-ENV LANG C.UTF-8
-
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -14,10 +9,11 @@ RUN apt-get update \
         dirmngr \
         fonts-noto-cjk \
         gnupg \
-        libssl-dev \
+        libssl1.0-dev \
+        nodejs-dev \
+        node-gyp \
         node-less \
         npm \
-        python3-num2words \
         python3-pip \
         python3-phonenumbers \
         python3-pyldap \
@@ -28,15 +24,14 @@ RUN apt-get update \
         python3-vobject \
         python3-watchdog \
         python3-xlrd \
-        python3-xlwt \
         xz-utils \
-    && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb \
-    && echo 'ea8277df4297afc507c61122f3c349af142f31e5 wkhtmltox.deb' | sha1sum -c - \
+    && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
+    && echo 'f1689a1b302ff102160f2693129f789410a1708a wkhtmltox.deb' | sha1sum -c - \
     && apt-get install -y --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* wkhtmltox.deb
 
 # install latest postgresql-client
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
+RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
     && GNUPGHOME="$(mktemp -d)" \
     && export GNUPGHOME \
     && repokey='B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8' \
@@ -65,17 +60,16 @@ RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/od
 RUN mkdir -p /odoo && mkdir -p /mnt/extra-addons
 
 # Copy entrypoint script and Odoo configuration file
-COPY ../entrypoint.sh /
-COPY ../odoo.conf /etc/odoo/
+COPY entrypoint.sh /
+COPY odoo.conf /etc/odoo/
 COPY requirements.txt /odoo/
+COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Mount /var/lib/odoo to allow restoring filestore
 VOLUME ["/var/lib/odoo"]
 
 # Expose Odoo services
 EXPOSE 8069 8072
-
-COPY ../wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 RUN cd /odoo && pip3 install -r requirements.txt
 
