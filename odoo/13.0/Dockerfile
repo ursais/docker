@@ -1,11 +1,6 @@
 FROM ursa/ubuntu-18.04:latest
 MAINTAINER Open Source Integrators <contact@opensourceintegrators.com>
 
-SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
-
-# Generate locale C.UTF-8 for postgres and general locale data
-ENV LANG C.UTF-8
-
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -14,7 +9,9 @@ RUN apt-get update \
         dirmngr \
         fonts-noto-cjk \
         gnupg \
-        libssl-dev \
+        libssl1.0-dev \
+        nodejs-dev \
+        node-gyp \
         node-less \
         npm \
         python3-pip \
@@ -26,6 +23,7 @@ RUN apt-get update \
         python3-slugify \
         python3-vobject \
         python3-watchdog \
+        python3-wheel \
         python3-xlrd \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
@@ -47,13 +45,10 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/
     && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
-# Install rtlcss (on Debian buster)
-RUN npm install -g rtlcss
-
 # Install Odoo
 ENV ODOO_VERSION 13.0
-ARG ODOO_RELEASE=20201123
-ARG ODOO_SHA=1af64956f215ba0a2991ac6c86b98610c480c17b
+ARG ODOO_RELEASE=20201204
+ARG ODOO_SHA=1e482502fc2270ae29e55afe485f10d945396cd6
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
     && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
     && apt-get update \
@@ -74,16 +69,7 @@ VOLUME ["/var/lib/odoo"]
 # Expose Odoo services
 EXPOSE 8069 8072
 
-# Copy Odoo Addons
-COPY src/private-addons /mnt/extra-addons/
-#COPY src/enterprise /mnt/extra-addons/
-# Add your module to the list below. Please respect the alphabetic order
-# Example: COPY src/web/web_timeline /mnt/extra-addons/web_timeline
-
-COPY data /odoo/data
-COPY songs /odoo/songs
-
-RUN cd /odoo && pip3 install -r requirements.txt
+RUN pip3 install -r /odoo/requirements.txt
 
 RUN chown -R odoo /etc/odoo /mnt/extra-addons /odoo
 

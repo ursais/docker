@@ -23,6 +23,7 @@ RUN apt-get update \
         python3-slugify \
         python3-vobject \
         python3-watchdog \
+        python3-wheel \
         python3-xlrd \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
@@ -44,13 +45,10 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/
     && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
-# Install rtlcss (on Debian buster)
-RUN npm install -g rtlcss
-
 # Install Odoo
 ENV ODOO_VERSION 12.0
-ARG ODOO_RELEASE=20201012
-ARG ODOO_SHA=0d5aa5f1d0249863b04c06a5cb8ec8587ac522da
+ARG ODOO_RELEASE=20201204
+ARG ODOO_SHA=483f8deeaec11900d1a3f4a92baf1d5c1089c4a4
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
     && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
     && apt-get update \
@@ -71,7 +69,7 @@ VOLUME ["/var/lib/odoo"]
 # Expose Odoo services
 EXPOSE 8069 8072
 
-RUN cd /odoo && pip3 install -r requirements.txt
+RUN pip3 install -r /odoo/requirements.txt
 
 RUN chown -R odoo /etc/odoo /mnt/extra-addons /odoo
 
