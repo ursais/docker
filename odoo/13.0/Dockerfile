@@ -73,8 +73,6 @@ RUN pip3 install -r /odoo/requirements.txt
 
 RUN chown -R odoo /etc/odoo /mnt/extra-addons /odoo
 
-USER odoo
-
 # Set the default config file
 ENV ODOO_RC /etc/odoo/odoo.conf
 
