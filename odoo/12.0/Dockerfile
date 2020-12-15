@@ -9,6 +9,7 @@ RUN apt-get update \
         dirmngr \
         fonts-noto-cjk \
         gnupg \
+        libpq-dev \
         libssl1.0-dev \
         nodejs-dev \
         node-gyp \
