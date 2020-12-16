@@ -15,6 +15,7 @@ set -e
 : ${MODE:=${MODE:='full'}}
 
 DB_ARGS=()
+
 function check_config() {
     param="$1"
     value="$2"
@@ -24,6 +25,33 @@ function check_config() {
     DB_ARGS+=("--${param}")
     DB_ARGS+=("${value}")
 }
+
+function migrate() {
+  OLD=""
+  DB_EXIST=$(psql -X -A -t -h $HOST -p $PORT postgres -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
+  if [ "$DB_EXIST" = "1" ]; then
+    TABLE_EXIST=$(psql -X -A -t -h $HOST -p $PORT -d $1 -c "
+      SELECT EXISTS(
+        SELECT *
+        FROM information_schema.tables
+        WHERE table_schema='public' AND
+          table_catalog='$1' AND
+          table_name='ir_config_parameter'
+      )";)
+    if [ "$TABLE_EXIST" = "1" ]; then
+      OLD=$(psql -X -A -t -h $HOST -p $PORT -v ON_ERROR_STOP=1 -d $1 -c "SELECT value FROM ir_config_parameter WHERE key = 'database.version'" 2> /dev/null ;)
+    fi
+  fi
+  NEW=$(grep version= /odoo/setup.py | sed -e 's/^ *version="//' -e 's/",$//')
+  if [ "$OLD" != "$NEW" ]; then
+    echo "db_name = $1" >> $OPENERP_SERVER
+    export MARABUNTA_DATABASE=$1
+    [ ! "$OLD" = "" ] && export MARABUNTA_FORCE_VERSION=$NEW
+    marabunta --allow-serie=True
+    sed -i -e '/db_name.*$/d' $OPENERP_SERVER
+  fi
+}
+
 check_config "db_host" "$HOST"
 check_config "db_port" "$PORT"
 check_config "db_user" "$USER"
@@ -52,43 +80,14 @@ sed -i -e '/db_name.*$/d' $OPENERP_SERVER
 
 cd /odoo
 
-
-function migrate() {
-  OLD=""
-  DB_EXIST=$(psql -X -A -t -h $HOST -p $PORT postgres -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
-  if [ "$DB_EXIST" = "1" ]; then
-    TABLE_EXIST=$(psql -X -A -t -h $HOST -p $PORT -d $1 -c "
-      SELECT EXISTS(
-        SELECT *
-        FROM information_schema.tables
-        WHERE table_schema='public' AND
-          table_catalog='$1' AND
-          table_name='ir_config_parameter'
-      )";)
-    if [ "$TABLE_EXIST" = "1" ]; then
-      OLD=$(psql -X -A -t -h $HOST -p $PORT -v ON_ERROR_STOP=1 -d $1 -c "SELECT value FROM ir_config_parameter WHERE key = 'database.version'" 2> /dev/null ;)
-    fi
-  fi
-  NEW=$(grep version= /odoo/setup.py | sed -e 's/^ *version="//' -e 's/",$//')
-  if [ "$OLD" != "$NEW" ]; then
-    echo "db_name = $1" >> $OPENERP_SERVER
-    export MARABUNTA_DATABASE=$1
-    [ ! "$OLD" = "" ] && export MARABUNTA_FORCE_VERSION=$NEW
-    marabunta --allow-serie=True
-    sed -i -e '/db_name.*$/d' $OPENERP_SERVER
-  fi
-}
-# For Jenkins
 # Check if the 2nd command line argument is --test-enable
-if [ "$1" == "--test-enable" ]
-then
+if [ "$1" == "--test-enable" ] ; then
   # Change configuration of demo data
   sed -i -e 's/without_demo = all/without_demo = False/g' $OPENERP_SERVER
   # Run odoo with all command line arguments
   echo "Running Odoo with the following commands: odoo $@"
   exec odoo "$@"
   exit 0
-
 else
   echo "Upgrade existing databases"
   DATABASES=$(psql -X -A -t -h $HOST -p $PORT postgres -c "
@@ -152,4 +151,5 @@ else
           exec "$@"
   esac
 fi
+
 exit 1
