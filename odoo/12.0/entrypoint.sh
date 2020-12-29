@@ -83,9 +83,12 @@ cd /odoo
 
 # Check if the 2nd command line argument is --test-enable
 if [ "$1" == "--test-enable" ] ; then
+  # Change configuration of demo data
+  sed -i -e 's/without_demo = all/without_demo = False/g' $OPENERP_SERVER
   # Run odoo with all command line arguments
   echo "Running Odoo with the following commands: odoo $@"
   exec odoo "$@"
+  exit 0
 else
   echo "Upgrade existing databases"
   DATABASES=$(psql -X -A -t -h $HOST -p $PORT postgres -c "
