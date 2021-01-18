@@ -101,9 +101,9 @@ else
     migrate $DB_NAME
   done
   
-  MASTER=$(psql -X -A -t -h $HOST -p $PORT-U $USER  $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'MASTER'";)
-  BACKUP=$(psql -X -A -t -h $HOST -p $PORT-U $USER  $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP'";)
-  LATEST=$(psql -X -A -t -h $HOST -p $PORT-U $USER  $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'LATEST'";)
+  MASTER=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'MASTER'";)
+  BACKUP=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP'";)
+  LATEST=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'LATEST'";)
   
   # If LATEST database exists, drop it, re-create it and upgrade
   if [ "$LATEST" = "1" ]; then
