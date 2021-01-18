@@ -59,7 +59,7 @@ check_config "db_port" "$PORT"
 check_config "db_user" "$USER"
 check_config "db_password" "$PASSWORD"
 
-wait-for-psql.py ${DB_ARGS[@]} --timeout=30
+wait-for-psql.py ${DB_ARGS[@]} --timeout=30 --db_name=${DEFAULTDB}
 
 export PGPASSWORD=$PASSWORD
 # For Marabunta
