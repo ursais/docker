@@ -12,6 +12,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--db_port", required=True)
     arg_parser.add_argument("--db_user", required=True)
     arg_parser.add_argument("--db_password", required=True)
+    arg_parser.add_argument("--db_name", required=True)
     arg_parser.add_argument("--timeout", type=int, default=5)
 
     args = arg_parser.parse_args()
@@ -24,7 +25,7 @@ if __name__ == "__main__":
                 host=args.db_host,
                 port=args.db_port,
                 password=args.db_password,
-                dbname="postgres",
+                dbname=args.db_name,
             )
             error = ""
             break

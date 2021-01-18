@@ -4,6 +4,7 @@
 * [CentOS](https://github.com/ursais/docker#CentOS)
 * [Debian](https://github.com/ursais/docker#Debian)
 * [Odoo](https://github.com/ursais/docker#Odoo)
+* [PostgreSQL](https://github.com/ursais/docker#PostgreSQL)
 * [Red Hat](https://github.com/ursais/docker#Red-Hat)
 * [Ubuntu](https://github.com/ursais/docker#Ubuntu)
 * [Support](https://github.com/ursais/docker#Support)
