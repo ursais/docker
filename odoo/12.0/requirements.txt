@@ -1,4 +1,6 @@
 anthem==0.13.0
+boto3==1.9.102
 marabunta==0.10.4
 numpy==1.18.5
 openupgradelib==2.0.0
+redis==2.10.5
