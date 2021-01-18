@@ -65,10 +65,10 @@ COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Copy Odoo addons
+COPY src/odoo-cloud-platform/attachment_s3 /mnt/extra-addons/attachment_s3
+COPY src/odoo-cloud-platform/base_attachment_object_storage /mnt/extra-addons/base_attachment_object_storage
 COPY src/odoo-cloud-platform/monitoring_status /mnt/extra-addons/monitoring_status
-
-# Mount /var/lib/odoo to allow restoring filestore
-VOLUME ["/var/lib/odoo"]
+COPY src/odoo-cloud-platform/session_redis /mnt/extra-addons/session_redis
 
 # Expose Odoo services
 EXPOSE 8069 8072
