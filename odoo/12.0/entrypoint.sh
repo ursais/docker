@@ -12,6 +12,7 @@ set -e
 : ${PORT:=${DB_PORT_5432_TCP_PORT:=5432}}
 : ${USER:=${DB_ENV_POSTGRES_USER:=${POSTGRES_USER:='odoo'}}}
 : ${PASSWORD:=${DB_ENV_POSTGRES_PASSWORD:=${POSTGRES_PASSWORD:='odoo'}}}
+: ${DEFAULTDB:=${DB_ENV_POSTGRES_DEFAULTDB:=${POSTGRES_DEFAULTDB:='postgres'}}}
 : ${MODE:=${MODE:='full'}}
 
 DB_ARGS=()
@@ -29,9 +30,9 @@ function check_config() {
 
 function migrate() {
   OLD=""
-  DB_EXIST=$(psql -X -A -t -h $HOST -p $PORT postgres -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
+  DB_EXIST=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$DB_EXIST" = "1" ]; then
-    TABLE_EXIST=$(psql -X -A -t -h $HOST -p $PORT -d $1 -c "
+    TABLE_EXIST=$(psql -X -A -t -h $HOST -p $PORT -U $USER -d $1 -c "
       SELECT EXISTS(
         SELECT *
         FROM information_schema.tables
@@ -40,7 +41,7 @@ function migrate() {
           table_name='ir_config_parameter'
       )";)
     if [ "$TABLE_EXIST" = "1" ]; then
-      OLD=$(psql -X -A -t -h $HOST -p $PORT -v ON_ERROR_STOP=1 -d $1 -c "SELECT value FROM ir_config_parameter WHERE key = 'database.version'" 2> /dev/null ;)
+      OLD=$(psql -X -A -t -h $HOST -p $PORT -U $USER -v ON_ERROR_STOP=1 -d $1 -c "SELECT value FROM ir_config_parameter WHERE key = 'database.version'" 2> /dev/null ;)
     fi
   fi
   NEW=$(grep version= /odoo/setup.py | sed -e 's/^ *version="//' -e 's/",$//')
@@ -91,36 +92,36 @@ if [ "$1" == "--test-enable" ] ; then
   exit 0
 else
   echo "Upgrade existing databases"
-  DATABASES=$(psql -X -A -t -h $HOST -p $PORT postgres -c "
+  DATABASES=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "
     SELECT datname
     FROM pg_database
-    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', 'template0', 'template1')";)
+    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', '_dodb', 'template0', 'template1')";)
   for DB_NAME in $DATABASES; do
     echo $DB_NAME
     migrate $DB_NAME
   done
   
-  MASTER=$(psql -X -A -t -h $HOST -p $PORT postgres -c "SELECT 1 AS result FROM pg_database WHERE datname = 'MASTER'";)
-  BACKUP=$(psql -X -A -t -h $HOST -p $PORT postgres -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP'";)
-  LATEST=$(psql -X -A -t -h $HOST -p $PORT postgres -c "SELECT 1 AS result FROM pg_database WHERE datname = 'LATEST'";)
+  MASTER=$(psql -X -A -t -h $HOST -p $PORT-U $USER  $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'MASTER'";)
+  BACKUP=$(psql -X -A -t -h $HOST -p $PORT-U $USER  $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP'";)
+  LATEST=$(psql -X -A -t -h $HOST -p $PORT-U $USER  $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'LATEST'";)
   
   # If LATEST database exists, drop it, re-create it and upgrade
   if [ "$LATEST" = "1" ]; then
     echo "Drop, recreate and upgrade LATEST"
     export DB_NAME=LATEST
-    dropdb -h $HOST -p $PORT $DB_NAME
+    dropdb -h $HOST -p $PORT -U $USER $DB_NAME
     rm -rf /var/lib/odoo/filestore/$DB_NAME
-    createdb -h $HOST -p $PORT $DB_NAME
+    createdb -h $HOST -p $PORT -U $USER $DB_NAME
     migrate $DB_NAME
   elif [ "$BACKUP" = "1" ]; then
     # If BACKUP database exists, copy it and upgrade it
     # TODO: Build DB_NAME with the tag of the image
     export DB_NAME=Test_$(date +'%Y%m%d')
-    TODAY=$(psql -X -A -t -h $HOST -p $PORT postgres -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
+    TODAY=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
     # Create one TEST_YYYYMMDD database per day
     if [ ! "$TODAY" = "1" ] ; then
       echo "Create and upgrade $DB_NAME"
-      psql -h $HOST -p $PORT postgres -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE 'BACKUP'";
+      psql -h $HOST -p $PORT -U $USER $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE 'BACKUP'";
       cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
       migrate $DB_NAME
     fi
@@ -129,7 +130,7 @@ else
     export DB_NAME=MASTER
     if [ ! "$MASTER" = "1" ]; then
       echo "Create MASTER"
-      createdb -h $HOST -p $PORT $DB_NAME
+      createdb -h $HOST -p $PORT -U $USER $DB_NAME
     fi
     echo "Upgrade MASTER"
     migrate $DB_NAME
