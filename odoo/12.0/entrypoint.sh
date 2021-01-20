@@ -59,6 +59,7 @@ check_config "db_port" "$PORT"
 check_config "db_user" "$USER"
 check_config "db_password" "$PASSWORD"
 
+# shellcheck disable=SC2068
 wait-for-psql.py ${DB_ARGS[@]} --timeout=30 --db_name=${DEFAULTDB}
 
 export PGPASSWORD=$PASSWORD
@@ -95,7 +96,7 @@ else
   DATABASES=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "
     SELECT datname
     FROM pg_database
-    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', '_dodb', 'template0', 'template1')";)
+    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', '_dodb', 'defaultdb', 'template0', 'template1')";)
   for DB_NAME in $DATABASES; do
     echo $DB_NAME
     migrate $DB_NAME
