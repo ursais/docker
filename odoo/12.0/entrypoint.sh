@@ -8,10 +8,10 @@ set -e
 
 # set the postgres database host, port, user and password according to the environment
 # and pass them as arguments to the odoo process if not present in the config file
-: ${HOST:=${DB_PORT_5432_TCP_ADDR:='db'}}
-: ${PORT:=${DB_PORT_5432_TCP_PORT:=5432}}
-: ${USER:=${DB_ENV_POSTGRES_USER:=${POSTGRES_USER:='odoo'}}}
-: ${PASSWORD:=${DB_ENV_POSTGRES_PASSWORD:=${POSTGRES_PASSWORD:='odoo'}}}
+: ${HOST:=${PGHOST:='db'}}
+: ${PORT:=${PGPORT:=5432}}
+: ${USER:=${PGUSER:=${POSTGRES_USER:='odoo'}}}
+: ${PASSWORD:=${PGPASSWORD:=${POSTGRES_PASSWORD:='odoo'}}}
 : ${DEFAULTDB:=${DB_ENV_POSTGRES_DEFAULTDB:=${POSTGRES_DEFAULTDB:='postgres'}}}
 : ${MODE:=${MODE:='full'}}
 
@@ -32,6 +32,7 @@ function migrate() {
   OLD=""
   DB_EXIST=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$DB_EXIST" = "1" ]; then
+    export PGDATABASE=$1
     TABLE_EXIST=$(psql -X -A -t -h $HOST -p $PORT -U $USER -d $1 -c "
       SELECT EXISTS(
         SELECT *
@@ -62,7 +63,6 @@ check_config "db_password" "$PASSWORD"
 # shellcheck disable=SC2068
 wait-for-psql.py ${DB_ARGS[@]} --timeout=30 --db_name=${DEFAULTDB}
 
-export PGPASSWORD=$PASSWORD
 # For Marabunta
 export MARABUNTA_MIGRATION_FILE=/odoo/migration.yml
 export MARABUNTA_DB_USER=$USER
