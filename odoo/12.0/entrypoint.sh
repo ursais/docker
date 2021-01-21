@@ -14,6 +14,7 @@ set -e
 : ${PASSWORD:=${DB_ENV_POSTGRES_PASSWORD:=${POSTGRES_PASSWORD:='odoo'}}}
 : ${DEFAULTDB:=${DB_ENV_POSTGRES_DEFAULTDB:=${POSTGRES_DEFAULTDB:='postgres'}}}
 : ${MODE:=${MODE:='full'}}
+: ${ADMIN_PASSWD:='admin'}
 
 DB_ARGS=()
 
@@ -83,6 +84,7 @@ grep db_host $OPENERP_SERVER > /dev/null || echo "db_host = $HOST" >> $OPENERP_S
 grep db_port $OPENERP_SERVER > /dev/null || echo "db_port = $PORT" >> $OPENERP_SERVER
 grep db_user $OPENERP_SERVER > /dev/null || echo "db_user = $USER" >> $OPENERP_SERVER
 grep db_password $OPENERP_SERVER > /dev/null || echo "db_password = $PASSWORD" >> $OPENERP_SERVER
+sed -i -e "s/admin_passwd.*$/admin_passwd = $ADMIN_PASSWD/" $OPENERP_SERVER
 sed -i -e '/db_name.*$/d' $OPENERP_SERVER
 
 cd /odoo
@@ -92,6 +94,7 @@ if [ "$1" == "--test-enable" ] ; then
   # Change configuration of demo data
   sed -i -e 's/without_demo = all/without_demo = False/g' $OPENERP_SERVER
   # Run odoo with all command line arguments
+  # shellcheck disable=SC2145
   echo "Running Odoo with the following commands: odoo $@"
   exec odoo "$@"
   exit 0
