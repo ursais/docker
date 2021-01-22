@@ -6,4 +6,5 @@ RUN apt-get update \
         postgresql-13-postgis-3 \
         postgresql-13-postgis-3-scripts \
         postgresql-contrib \
+        pg-activity \
     && rm -rf /var/lib/apt/lists/*
