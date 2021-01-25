@@ -26,6 +26,7 @@ RUN apt-get update \
         python3-watchdog \
         python3-wheel \
         python3-xlrd \
+        s3cmd \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
     && echo 'f1689a1b302ff102160f2693129f789410a1708a wkhtmltox.deb' | sha1sum -c - \
@@ -48,8 +49,8 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/
 
 # Install Odoo
 ENV ODOO_VERSION 12.0
-ARG ODOO_RELEASE=20201204
-ARG ODOO_SHA=483f8deeaec11900d1a3f4a92baf1d5c1089c4a4
+ARG ODOO_RELEASE=20210125
+ARG ODOO_SHA=5d7f14dbe452f48c3ac6caf28a44ba2469f06cfd
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
     && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
     && apt-get update \
