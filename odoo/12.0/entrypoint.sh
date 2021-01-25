@@ -16,17 +16,36 @@ set -e
 : ${MODE:=${MODE:='full'}}
 : ${ODOO_ADMIN_PASSWD:='admin'}
 : ${RUNNING_ENV:='dev'}
+: ${AWS_HOST:='false'}
+: ${AWS_REGION:='false'}
+: ${AWS_ACCESS_KEY_ID:='false'}
+: ${AWS_SECRET_ACCESS_KEY:='false'}
+: ${AWS_BUCKETNAME:='false'}
 
 DB_ARGS=()
 
 function check_config() {
-    param="$1"
-    value="$2"
-    if grep -q -E "^\s*\b${param}\b\s*=" "$ODOO_RC" ; then
-        value=$(grep -E "^\s*\b${param}\b\s*=" "$ODOO_RC" |cut -d " " -f3|sed 's/["\n\r]//g')
-    fi;
-    DB_ARGS+=("--${param}")
-    DB_ARGS+=("${value}")
+  param="$1"
+  value="$2"
+  if grep -q -E "^\s*\b${param}\b\s*=" "$ODOO_RC" ; then
+      value=$(grep -E "^\s*\b${param}\b\s*=" "$ODOO_RC" | cut -d " " -f3 | sed 's/["\n\r]//g')
+  fi;
+  DB_ARGS+=("--${param}")
+  DB_ARGS+=("${value}")
+}
+
+function config_s3 () {
+  INSTALLED=`command -v s3cmd > dev/null 2>&1`
+  if [ ! "$AWS_HOST" == "false" ] && [ "$INSTALLED" == "0" ]; then
+    S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
+    cat << EOF >  ~/.s3cfg
+[default]
+access_key = $AWS_ACCESS_KEY_ID
+host_base = $S3CMD_HOST
+host_bucket = %(bucket)s.$S3CMD_HOST
+secret_key = $AWS_SECRET_ACCESS_KEY
+EOF
+  fi
 }
 
 function migrate() {
@@ -101,6 +120,7 @@ check_config "db_host" "$HOST"
 check_config "db_port" "$PORT"
 check_config "db_user" "$USER"
 check_config "db_password" "$PASSWORD"
+config_s3
 
 # shellcheck disable=SC2068
 wait-for-psql.py ${DB_ARGS[@]} --timeout=30 --db_name=${DEFAULTDB}
