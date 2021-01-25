@@ -15,17 +15,37 @@ set -e
 : ${DEFAULTDB:=${DB_ENV_POSTGRES_DEFAULTDB:=${POSTGRES_DEFAULTDB:='postgres'}}}
 : ${MODE:=${MODE:='full'}}
 : ${ODOO_ADMIN_PASSWD:='admin'}
+: ${RUNNING_ENV:='dev'}
+: ${AWS_HOST:='false'}
+: ${AWS_REGION:='false'}
+: ${AWS_ACCESS_KEY_ID:='false'}
+: ${AWS_SECRET_ACCESS_KEY:='false'}
+: ${AWS_BUCKETNAME:='false'}
 
 DB_ARGS=()
 
 function check_config() {
-    param="$1"
-    value="$2"
-    if grep -q -E "^\s*\b${param}\b\s*=" "$ODOO_RC" ; then
-        value=$(grep -E "^\s*\b${param}\b\s*=" "$ODOO_RC" |cut -d " " -f3|sed 's/["\n\r]//g')
-    fi;
-    DB_ARGS+=("--${param}")
-    DB_ARGS+=("${value}")
+  param="$1"
+  value="$2"
+  if grep -q -E "^\s*\b${param}\b\s*=" "$ODOO_RC" ; then
+      value=$(grep -E "^\s*\b${param}\b\s*=" "$ODOO_RC" | cut -d " " -f3 | sed 's/["\n\r]//g')
+  fi;
+  DB_ARGS+=("--${param}")
+  DB_ARGS+=("${value}")
+}
+
+function config_s3 () {
+  INSTALLED=`command -v s3cmd > dev/null 2>&1`
+  if [ ! "$AWS_HOST" == "false" ] && [ "$INSTALLED" == "0" ]; then
+    S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
+    cat << EOF >  ~/.s3cfg
+[default]
+access_key = $AWS_ACCESS_KEY_ID
+host_base = $S3CMD_HOST
+host_bucket = %(bucket)s.$S3CMD_HOST
+secret_key = $AWS_SECRET_ACCESS_KEY
+EOF
+  fi
 }
 
 function migrate() {
@@ -55,10 +75,52 @@ function migrate() {
   fi
 }
 
+function duplicate() {
+  psql $DEFAULTDB -c "CREATE DATABASE \"$2\" WITH TEMPLATE \"$1\"";
+  if [ "$AWS_HOST" == "false" ]; then
+    cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
+  else
+    s3cmd cp s3://$AWS_BUCKET/$1 s3://$AWS_BUCKET/$2
+  fi
+  migrate $DB_NAME
+}
+
+function create() {
+  EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
+  if [ ! "$EXIST" = "1" ]; then
+    echo "Create $1"
+    createdb $1
+  fi
+  migrate $1
+}
+
+function recreate() {
+  dropdb $1
+  if [ "$AWS_HOST" == "false" ]; then
+    rm -Rf /var/lib/odoo/filestore/$1
+  else
+    s3cmd rm s3://$AWS_BUCKET/$2
+  fi
+  create $1
+}
+
+function upgrade_existing () {
+  echo "Upgrade existing databases"
+  DATABASES=$(psql -X -A -t $DEFAULTDB -c "
+    SELECT datname
+    FROM pg_database
+    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', '_dodb', 'defaultdb', 'template0', 'template1')";)
+  for DB_NAME in $DATABASES; do
+    echo "Upgrading $DB_NAME"
+    migrate $DB_NAME
+  done
+}
+
 check_config "db_host" "$HOST"
 check_config "db_port" "$PORT"
 check_config "db_user" "$USER"
 check_config "db_password" "$PASSWORD"
+config_s3
 
 # shellcheck disable=SC2068
 wait-for-psql.py ${DB_ARGS[@]} --timeout=30 --db_name=${DEFAULTDB}
@@ -99,50 +161,45 @@ if [ "$1" == "--test-enable" ] ; then
   exec odoo "$@"
   exit 0
 else
-  echo "Upgrade existing databases"
-  DATABASES=$(psql -X -A -t $DEFAULTDB -c "
-    SELECT datname
-    FROM pg_database
-    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', '_dodb', 'defaultdb', 'template0', 'template1')";)
-  for DB_NAME in $DATABASES; do
-    echo $DB_NAME
-    migrate $DB_NAME
-  done
-  
-  MASTER=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'MASTER'";)
-  BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP'";)
-  LATEST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'LATEST'";)
-  
-  # If LATEST database exists, drop it, re-create it and upgrade
-  if [ "$LATEST" = "1" ]; then
-    echo "Drop, recreate and upgrade LATEST"
-    export DB_NAME=LATEST
-    dropdb $DB_NAME
-    rm -rf /var/lib/odoo/filestore/$DB_NAME
-    createdb $DB_NAME
-    migrate $DB_NAME
-  elif [ "$BACKUP" = "1" ]; then
-    # If BACKUP database exists, copy it and upgrade it
-    # TODO: Build DB_NAME with the tag of the image
-    export DB_NAME=Test_$(date +'%Y%m%d')
-    TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
-    # Create one TEST_YYYYMMDD database per day
-    if [ ! "$TODAY" = "1" ] ; then
-      echo "Create and upgrade $DB_NAME"
-      psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE 'BACKUP'";
-      cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
-      migrate $DB_NAME
-    fi
-  else
-    # If MASTER database doesn't exist, create one...
-    export DB_NAME=MASTER
-    if [ ! "$MASTER" = "1" ]; then
-      echo "Create MASTER"
-      createdb $DB_NAME
-    fi
-    echo "Upgrade MASTER"
-    migrate $DB_NAME
-  fi
+  case "$RUNNING_ENV" in
+    "production")
+      # If MASTER database doesn't exist, create one...
+      export DB_NAME=MASTER
+      create $DB_NAME
+      ;;
+    "qa")
+      upgrade_existing
+      if [ "$BACKUP" = "1" ]; then
+        # If BACKUP database exists, copy it and upgrade it
+        # TODO: Build DB_NAME with the tag of the image
+        export DB_NAME=Test_$(date +'%Y%m%d')
+        TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
+        # Create one TEST_YYYYMMDD database per day
+        if [ ! "$TODAY" = "1" ] ; then
+          echo "Create and upgrade $DB_NAME"
+          duplicate $BACKUP $DB_NAME
+        fi
+      fi
+      ;;
+    "test")
+      upgrade_existing
+      if [ "$BACKUP" = "1" ]; then
+        # If BACKUP database exists, copy it and upgrade it
+        # TODO: Build DB_NAME with the tag of the image
+        export DB_NAME=Test_$(date +'%Y%m%d')
+        TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
+        # Create one TEST_YYYYMMDD database per day
+        if [ ! "$TODAY" = "1" ] ; then
+          echo "Create and upgrade $DB_NAME"
+          duplicate $BACKUP $DB_NAME
+        fi
+      fi
+      ;;
+    *) # dev
+      echo "Recreate LATEST"
+      export DB_NAME=LATEST
+      recreate $DB_NAME
+  esac
   
   # Start Odoo
   case "$1" in
