@@ -201,6 +201,7 @@ else
     *) # dev
       echo "Recreate LATEST"
       recreate LATEST
+      ;;
   esac
   
   # Start Odoo
