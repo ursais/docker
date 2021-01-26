@@ -97,11 +97,11 @@ function create() {
 }
 
 function recreate() {
-  dropdb $1
+  dropdb --if-exists $1
   if [ "$AWS_HOST" == "false" ]; then
     rm -Rf /var/lib/odoo/filestore/$1
   else
-    s3cmd rm --recursive s3://$AWS_BUCKET/$RUNNING_ENV/
+    s3cmd rm --force --recursive s3://$AWS_BUCKET/$RUNNING_ENV/
   fi
   create $1
 }
