@@ -82,7 +82,7 @@ function duplicate() {
   # TODO: Uncomment the next 2 lines when
   #  https://github.com/camptocamp/odoo-cloud-platform/issues/215 is implemented
   # else
-    # s3cmd cp s3://$AWS_BUCKET/$RUNNING_ENV/$1 s3://$AWS_BUCKET/$RUNNING_ENV/$2
+    # s3cmd cp s3://$AWS_BUCKETNAME/$RUNNING_ENV/$1 s3://$AWS_BUCKETNAME/$RUNNING_ENV/$2
   fi
   migrate $DB_NAME
 }
@@ -101,7 +101,7 @@ function recreate() {
   if [ "$AWS_HOST" == "false" ]; then
     rm -Rf /var/lib/odoo/filestore/$1
   else
-    s3cmd rm --force --recursive s3://$AWS_BUCKET/$RUNNING_ENV/
+    s3cmd rm --force --recursive s3://$AWS_BUCKETNAME/$RUNNING_ENV/
   fi
   create $1
 }
