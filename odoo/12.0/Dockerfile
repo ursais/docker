@@ -1,5 +1,5 @@
 FROM ursa/ubuntu-18.04:latest
-MAINTAINER Open Source Integrators <contact@opensourceintegrators.com>
+MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt-get update \

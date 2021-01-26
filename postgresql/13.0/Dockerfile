@@ -1,5 +1,5 @@
 FROM postgres:13
-MAINTAINER Open Source Integrators <contact@opensourceintegrators.com>
+MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

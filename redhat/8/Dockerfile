@@ -1,5 +1,5 @@
 FROM registry.access.redhat.com/ubi8/ubi:8.1
-MAINTAINER Open Source Integrators <contact@opensourceintegrators.com>
+MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 

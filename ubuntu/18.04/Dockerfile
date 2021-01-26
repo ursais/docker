@@ -1,5 +1,5 @@
 FROM ubuntu:18.04
-MAINTAINER Open Source Integrators <contact@opensourceintegrators.com>
+MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
