@@ -79,8 +79,10 @@ function duplicate() {
   psql $DEFAULTDB -c "CREATE DATABASE \"$2\" WITH TEMPLATE \"$1\"";
   if [ "$AWS_HOST" == "false" ]; then
     cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
-  else
-    s3cmd cp s3://$AWS_BUCKET/$1 s3://$AWS_BUCKET/$2
+  # TODO: Uncomment the next 2 lines when
+  #  https://github.com/camptocamp/odoo-cloud-platform/issues/215 is implemented
+  # else
+    # s3cmd cp s3://$AWS_BUCKET/$RUNNING_ENV/$1 s3://$AWS_BUCKET/$RUNNING_ENV/$2
   fi
   migrate $DB_NAME
 }
@@ -99,7 +101,7 @@ function recreate() {
   if [ "$AWS_HOST" == "false" ]; then
     rm -Rf /var/lib/odoo/filestore/$1
   else
-    s3cmd rm s3://$AWS_BUCKET/$2
+    s3cmd rm --recursive s3://$AWS_BUCKET/$RUNNING_ENV/
   fi
   create $1
 }
@@ -163,9 +165,8 @@ if [ "$1" == "--test-enable" ] ; then
 else
   case "$RUNNING_ENV" in
     "production")
-      # If MASTER database doesn't exist, create one...
-      export DB_NAME=MASTER
-      create $DB_NAME
+      echo "Create/Upgrade MASTER"
+      create MASTER
       ;;
     "qa")
       upgrade_existing
@@ -197,8 +198,7 @@ else
       ;;
     *) # dev
       echo "Recreate LATEST"
-      export DB_NAME=LATEST
-      recreate $DB_NAME
+      recreate LATEST
   esac
   
   # Start Odoo
