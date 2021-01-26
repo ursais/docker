@@ -34,9 +34,10 @@ function check_config() {
   DB_ARGS+=("${value}")
 }
 
-function config_s3 () {
-  INSTALLED=`command -v s3cmd > dev/null 2>&1`
-  if [ ! "$AWS_HOST" == "false" ] && [ "$INSTALLED" == "0" ]; then
+function config_s3() {
+  command -v s3cmd > /dev/null 2>&1
+  if [ "$AWS_HOST" != "false" ] && [ "$?" == "0" ]; then
+    # If AWS_HOST is set and s3cmd is installed, configure it
     S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
     cat << EOF >  ~/.s3cfg
 [default]
@@ -45,6 +46,7 @@ host_base = $S3CMD_HOST
 host_bucket = %(bucket)s.$S3CMD_HOST
 secret_key = $AWS_SECRET_ACCESS_KEY
 EOF
+    export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
   fi
 }
 
@@ -82,7 +84,7 @@ function duplicate() {
   # TODO: Uncomment the next 2 lines when
   #  https://github.com/camptocamp/odoo-cloud-platform/issues/215 is implemented
   # else
-    # s3cmd cp s3://$AWS_BUCKETNAME/$RUNNING_ENV/$1 s3://$AWS_BUCKETNAME/$RUNNING_ENV/$2
+    # s3cmd cp s3://$DO_SPACE/$RUNNING_ENV/$1 s3://$DO_SPACE/$RUNNING_ENV/$2
   fi
   migrate $DB_NAME
 }
@@ -101,7 +103,7 @@ function recreate() {
   if [ "$AWS_HOST" == "false" ]; then
     rm -Rf /var/lib/odoo/filestore/$1
   else
-    s3cmd rm --force --recursive s3://$AWS_BUCKETNAME/$RUNNING_ENV/
+    s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV/
   fi
   create $1
 }
