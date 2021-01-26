@@ -26,6 +26,7 @@ RUN apt-get update \
         python3-watchdog \
         python3-wheel \
         python3-xlrd \
+        rsync \
         s3cmd \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
