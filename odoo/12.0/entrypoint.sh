@@ -78,27 +78,38 @@ function migrate() {
 }
 
 function duplicate() {
-  psql $DEFAULTDB -c "CREATE DATABASE \"$2\" WITH TEMPLATE \"BACKUP\"";
-  if [ "$AWS_HOST" == "false" ]; then
-    cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
-  # TODO: Uncomment the next 2 lines when
-  #  https://github.com/camptocamp/odoo-cloud-platform/issues/215 is implemented
-  # else
-    # s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/BACKUP s3://$DO_SPACE/$RUNNING_ENV/$2
+  BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP';")
+  if [ "$BACKUP" == "1" ]; then
+    # If BACKUP database exists, copy it and upgrade it
+    # TODO: Build DB_NAME with the tag of the image
+    export DB_NAME=$(date -u +'%Y%m%d')
+    TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
+    # Create one YYYYMMDD database per day
+    if [ "$TODAY" != "1" ] ; then
+      echo "Duplicating BACKUP to $DB_NAME"
+      psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE \"BACKUP\"";
+      if [ "$AWS_HOST" == "false" ]; then
+        cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
+      # TODO: Uncomment the next 2 lines when
+      #  https://github.com/camptocamp/odoo-cloud-platform/issues/215 is implemented
+      # else
+      # s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/BACKUP s3://$DO_SPACE/$RUNNING_ENV/$2
+      fi
+    fi
+    migrate $DB_NAME
   fi
-  migrate $DB_NAME
 }
 
-function upgrade() {
+function create() {
   EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$EXIST" != "1" ]; then
-    echo "Create $1"
+    echo "Creating $1"
     createdb $1
   fi
-  migrate $1
 }
 
-function recreate() {
+function drop() {
+  echo "Dropping $1"
   dropdb --if-exists $1
   if [ "$AWS_HOST" == "false" ]; then
     rm -Rf /var/lib/odoo/filestore/$1
@@ -106,7 +117,6 @@ function recreate() {
     # s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV/$1
     s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV/
   fi
-  create $1
 }
 
 function upgrade_existing () {
@@ -168,41 +178,21 @@ if [ "$1" == "--test-enable" ] ; then
 else
   case "$RUNNING_ENV" in
     "production")
-      echo "Upgrade MASTER"
-      upgrade MASTER
+      create MASTER
+      migrate MASTER
       ;;
     "qa")
       upgrade_existing
-      BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP';")
-      if [ "$BACKUP" == "1" ]; then
-        # If BACKUP database exists, copy it and upgrade it
-        # TODO: Build DB_NAME with the tag of the image
-        export DB_NAME=$(date -u +'%Y%m%d')
-        TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
-        # Create one YYYYMMDD database per day
-        if [ "$TODAY" != "1" ] ; then
-          echo "Create and upgrade $DB_NAME"
-          duplicate $BACKUP $DB_NAME
-        fi
-      fi
+      duplicate
       ;;
     "test")
       upgrade_existing
-      BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP';")
-      if [ "$BACKUP" == "1" ]; then
-        # If BACKUP database exists, copy it and upgrade it
-        export DB_NAME=$(date -u +'%Y%m%d')
-        TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
-        # Create one YYYYMMDD database per day
-        if [ "$TODAY" != "1" ] ; then
-          echo "Create and upgrade $DB_NAME"
-          duplicate $BACKUP $DB_NAME
-        fi
-      fi
+      duplicate
       ;;
     *) # dev
-      echo "Recreate LATEST"
-      recreate LATEST
+      drop LATEST
+      create LATEST
+      migrate LATEST
       ;;
   esac
   
