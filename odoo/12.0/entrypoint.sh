@@ -78,18 +78,18 @@ function migrate() {
 }
 
 function duplicate() {
-  psql $DEFAULTDB -c "CREATE DATABASE \"$2\" WITH TEMPLATE \"$1\"";
+  psql $DEFAULTDB -c "CREATE DATABASE \"$2\" WITH TEMPLATE \"BACKUP\"";
   if [ "$AWS_HOST" == "false" ]; then
     cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
   # TODO: Uncomment the next 2 lines when
   #  https://github.com/camptocamp/odoo-cloud-platform/issues/215 is implemented
   # else
-    # s3cmd cp s3://$DO_SPACE/$RUNNING_ENV/$1 s3://$DO_SPACE/$RUNNING_ENV/$2
+    # s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/BACKUP s3://$DO_SPACE/$RUNNING_ENV/$2
   fi
   migrate $DB_NAME
 }
 
-function create() {
+function upgrade() {
   EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$EXIST" != "1" ]; then
     echo "Create $1"
@@ -103,6 +103,7 @@ function recreate() {
   if [ "$AWS_HOST" == "false" ]; then
     rm -Rf /var/lib/odoo/filestore/$1
   else
+    # s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV/$1
     s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV/
   fi
   create $1
@@ -168,17 +169,18 @@ else
   case "$RUNNING_ENV" in
     "production")
       echo "Upgrade MASTER"
-      create MASTER
+      upgrade MASTER
       ;;
     "qa")
       upgrade_existing
-      if [ "$BACKUP" = "1" ]; then
+      BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP';")
+      if [ "$BACKUP" == "1" ]; then
         # If BACKUP database exists, copy it and upgrade it
         # TODO: Build DB_NAME with the tag of the image
-        export DB_NAME=Test_$(date +'%Y%m%d')
+        export DB_NAME=$(date +'%Y%m%d')
         TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
-        # Create one TEST_YYYYMMDD database per day
-        if [ ! "$TODAY" = "1" ] ; then
+        # Create one YYYYMMDD database per day
+        if [ "$TODAY" != "1" ] ; then
           echo "Create and upgrade $DB_NAME"
           duplicate $BACKUP $DB_NAME
         fi
@@ -186,13 +188,13 @@ else
       ;;
     "test")
       upgrade_existing
-      if [ "$BACKUP" = "1" ]; then
+      BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP';")
+      if [ "$BACKUP" == "1" ]; then
         # If BACKUP database exists, copy it and upgrade it
-        # TODO: Build DB_NAME with the tag of the image
-        export DB_NAME=Test_$(date +'%Y%m%d')
+        export DB_NAME=$(date +'%Y%m%d')
         TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
-        # Create one TEST_YYYYMMDD database per day
-        if [ ! "$TODAY" = "1" ] ; then
+        # Create one YYYYMMDD database per day
+        if [ "$TODAY" != "1" ] ; then
           echo "Create and upgrade $DB_NAME"
           duplicate $BACKUP $DB_NAME
         fi
