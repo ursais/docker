@@ -177,7 +177,7 @@ else
       if [ "$BACKUP" == "1" ]; then
         # If BACKUP database exists, copy it and upgrade it
         # TODO: Build DB_NAME with the tag of the image
-        export DB_NAME=$(date +'%Y%m%d')
+        export DB_NAME=$(date -u +'%Y%m%d')
         TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
         # Create one YYYYMMDD database per day
         if [ "$TODAY" != "1" ] ; then
@@ -191,7 +191,7 @@ else
       BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP';")
       if [ "$BACKUP" == "1" ]; then
         # If BACKUP database exists, copy it and upgrade it
-        export DB_NAME=$(date +'%Y%m%d')
+        export DB_NAME=$(date -u +'%Y%m%d')
         TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
         # Create one YYYYMMDD database per day
         if [ "$TODAY" != "1" ] ; then
