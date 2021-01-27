@@ -91,7 +91,7 @@ function duplicate() {
 
 function create() {
   EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
-  if [ ! "$EXIST" = "1" ]; then
+  if [ "$EXIST" != "1" ]; then
     echo "Create $1"
     createdb $1
   fi
@@ -167,7 +167,7 @@ if [ "$1" == "--test-enable" ] ; then
 else
   case "$RUNNING_ENV" in
     "production")
-      echo "Create/Upgrade MASTER"
+      echo "Upgrade MASTER"
       create MASTER
       ;;
     "qa")
