@@ -20,6 +20,10 @@ set -e
 : ${AWS_ACCESS_KEY_ID:='false'}
 : ${AWS_SECRET_ACCESS_KEY:='false'}
 : ${AWS_BUCKETNAME:='false'}
+# Date in UTC
+export TODAY=$(date -u +%Y%m%d)
+export YESTERDAY=$(date -d "1 day ago" -u +%Y%m%d)
+export LASTWEEK=$(date -d "1 week ago" -u +%Y%m%d)
 
 # Functions
 function config_s3() {
@@ -48,6 +52,8 @@ function backup() {
       # Duplicate the filestore
       # s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/$PGDATABASE/ s3://$DO_SPACE/backup/$TODAY/
       s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/ s3://$DO_SPACE/backup/$TODAY/
+      # Cleanup last week backup
+      s3cmd rm --recursive s3://$DO_SPACE/backup/$LASTWEEK/
       ;;
     *)
       echo "Backup profile does not exist. I don't know how to backup $1."
@@ -83,10 +89,6 @@ function restore() {
 }
 
 config_s3
-
-# Date in UTC
-export TODAY=$(date -u +%Y%m%d)
-export YESTERDAY=$(date -d "1 day ago" -u +%Y%m%d)
 
 $1 $2
 
