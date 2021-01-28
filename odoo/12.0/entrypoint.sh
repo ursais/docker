@@ -71,7 +71,7 @@ function migrate() {
   if [ "$OLD" != "$NEW" ]; then
     echo "db_name = $1" >> $OPENERP_SERVER
     export MARABUNTA_DATABASE=$1
-    [ ! "$OLD" = "" ] && export MARABUNTA_FORCE_VERSION=$NEW
+    [ "$OLD" != "" ] && export MARABUNTA_FORCE_VERSION=$NEW
     marabunta --allow-serie=True
     sed -i -e '/db_name.*$/d' $OPENERP_SERVER
   fi
@@ -90,10 +90,8 @@ function duplicate() {
       psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE \"BACKUP\"";
       if [ "$AWS_HOST" == "false" ]; then
         cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
-      # TODO: Uncomment the next 2 lines when
-      #  https://github.com/camptocamp/odoo-cloud-platform/issues/215 is implemented
-      # else
-      # s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/BACKUP s3://$DO_SPACE/$RUNNING_ENV/$2
+      else
+        s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/BACKUP/ s3://$DO_SPACE/$RUNNING_ENV/$DB_NAME/
       fi
     fi
     migrate $DB_NAME
@@ -114,8 +112,7 @@ function drop() {
   if [ "$AWS_HOST" == "false" ]; then
     rm -Rf /var/lib/odoo/filestore/$1
   else
-    # s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV/$1
-    s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV/
+    s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV/$1
   fi
 }
 

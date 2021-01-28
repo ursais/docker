@@ -50,8 +50,7 @@ function backup() {
       # Push it to the space
       s3cmd put /tmp/$TODAY.sql.gz s3://$DO_SPACE/backup/
       # Duplicate the filestore
-      # s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/$PGDATABASE/ s3://$DO_SPACE/backup/$TODAY/
-      s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/ s3://$DO_SPACE/backup/$TODAY/
+      s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/$PGDATABASE/ s3://$DO_SPACE/backup/$TODAY/
       # Cleanup last week backup
       s3cmd rm --recursive s3://$DO_SPACE/backup/$LASTWEEK/
       ;;
@@ -66,7 +65,7 @@ function restore() {
     "odoo")
       # Cleanup
       dropdb --if-exists BACKUP
-      # s3cmd rm --recursive s3://$DO_SPACE/$RUNNING_ENV/BACKUP
+      s3cmd rm --recursive s3://$DO_SPACE/$RUNNING_ENV/BACKUP
       createdb BACKUP
       # Download the latest one
       s3cmd get s3://$DO_SPACE/backup/$YESTERDAY.sql.gz /tmp/$YESTERDAY.sql.gz
@@ -79,8 +78,7 @@ function restore() {
       UPDATE fetchmail_server SET active = 'f';
       " BACKUP
       # Copy the filestore
-      # s3cmd cp --recursive s3://$DO_SPACE/backup/$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV/BACKUP/
-      s3cmd cp --recursive s3://$DO_SPACE/backup/$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV/
+      s3cmd cp --recursive s3://$DO_SPACE/backup/$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV/BACKUP/
       ;;
     *)
       echo "Restore profile does not exist. I don't know how to restore $1."
