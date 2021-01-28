@@ -1,0 +1,8 @@
+./odoo/12.0/src/odoo-cloud-platform:
+  remotes:
+    origin: https://github.com/camptocamp/odoo-cloud-platform.git
+    ursais: git+ssh://git@github.com/ursais/odoo-cloud-platform.git
+  merges:
+    - origin 12.0
+    - origin refs/pull/216/head
+  target: &default_target ursais docker/12.0
