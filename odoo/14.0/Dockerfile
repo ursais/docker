@@ -47,8 +47,8 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main' > /etc/a
 
 # Install Odoo
 ENV ODOO_VERSION 14.0
-ARG ODOO_RELEASE=20201204
-ARG ODOO_SHA=dad3d9fef21bf21802363785140f3a8865d42060
+ARG ODOO_RELEASE=20210129
+ARG ODOO_SHA=1ab63f2c5086619f2c6ca98600c75c75388f0585
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
     && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
     && apt-get update \
