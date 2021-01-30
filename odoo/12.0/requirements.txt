@@ -1,5 +1,5 @@
 anthem==0.13.0
-boto3==1.9.102
+boto3==1.16.63
 marabunta==0.10.5
 numpy==1.18.5
 openupgradelib==2.0.0

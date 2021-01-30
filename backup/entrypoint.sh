@@ -46,13 +46,14 @@ function backup() {
   case "$1" in
     "odoo")
       # Dump the database
-      pg_dump --clean $PGDATABASE | gzip > /tmp/$TODAY.sql.gz
+      pg_dump --clean $PGDATABASE | gzip > /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz
       # Push it to the space
-      s3cmd put /tmp/$TODAY.sql.gz s3://$DO_SPACE/backup/
+      s3cmd put /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz s3://$DO_SPACE/backup/
       # Duplicate the filestore
-      s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV/$PGDATABASE/ s3://$DO_SPACE/backup/$TODAY/
+      s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/ s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$TODAY/
       # Cleanup last week backup
-      s3cmd rm --recursive s3://$DO_SPACE/backup/$LASTWEEK/
+      s3cmd rm --recursive s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$LASTWEEK/
+      s3cmd rm s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$LASTWEEK.sql.gz
       ;;
     *)
       echo "Backup profile does not exist. I don't know how to backup $1."
@@ -65,12 +66,12 @@ function restore() {
     "odoo")
       # Cleanup
       dropdb --if-exists BACKUP
-      s3cmd rm --recursive s3://$DO_SPACE/$RUNNING_ENV/BACKUP
+      s3cmd rm --recursive s3://$DO_SPACE/$RUNNING_ENV-BACKUP/
       createdb BACKUP
       # Download the latest one
-      s3cmd get s3://$DO_SPACE/backup/$YESTERDAY.sql.gz /tmp/$YESTERDAY.sql.gz
+      s3cmd get s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY.sql.gz /tmp/production-MASTER-$YESTERDAY.sql.gz
       # Load it in BACKUP
-      zcat /tmp/$YESTERDAY.sql.gz | psql BACKUP
+      zcat /tmp/production-MASTER-$YESTERDAY.sql.gz | psql BACKUP
       # Deactivate the cron jobs and email servers
       psql -c "
       UPDATE ir_cron SET active = 'f';
@@ -78,7 +79,7 @@ function restore() {
       UPDATE fetchmail_server SET active = 'f';
       " BACKUP
       # Copy the filestore
-      s3cmd cp --recursive s3://$DO_SPACE/backup/$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV/BACKUP/
+      s3cmd cp --recursive s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV-BACKUP/
       ;;
     *)
       echo "Restore profile does not exist. I don't know how to restore $1."
