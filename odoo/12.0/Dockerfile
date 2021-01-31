@@ -58,8 +58,9 @@ RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/od
 
 RUN mkdir -p /odoo && mkdir -p /mnt/extra-addons
 
-# Copy entrypoint script and Odoo configuration file
+# Copy files
 COPY entrypoint.sh /
+COPY s3cfg /var/lib/odoo/.s3cfg
 COPY odoo.conf /etc/odoo/
 COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
@@ -75,7 +76,7 @@ EXPOSE 8069 8072
 
 RUN pip3 install -r /odoo/requirements.txt
 
-RUN chown -R odoo /etc/odoo /mnt/extra-addons /odoo
+RUN chown -R odoo /odoo /etc/odoo /mnt/extra-addons /var/lib/odoo
 
 # Set the default config file
 ENV ODOO_RC /etc/odoo/odoo.conf

@@ -39,13 +39,11 @@ function config_s3() {
   if [ "$AWS_HOST" != "false" ] && [ "$?" == "0" ]; then
     # If AWS_HOST is set and s3cmd is installed, configure it
     S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
-    cat << EOF >  ~/.s3cfg
-[default]
-access_key = $AWS_ACCESS_KEY_ID
-host_base = $S3CMD_HOST
-host_bucket = %(bucket)s.$S3CMD_HOST
-secret_key = $AWS_SECRET_ACCESS_KEY
-EOF
+    sed -i -e 's/access_key =.*$/access_key = $AWS_ACCESS_KEY_ID/'  ~/.s3cfg
+    sed -i -e 's/bucket_location =.*$/bucket_location = $AWS_REGION/'  ~/.s3cfg
+    sed -i -e 's/host_base =.*$/host_base = $S3CMD_HOST/'  ~/.s3cfg
+    sed -i -e 's/host_bucket =.*$/host_bucket = %(bucket)s.$S3CMD_HOST/'  ~/.s3cfg
+    sed -i -e 's/secret_key =.*$/secret_key = $AWS_SECRET_ACCESS_KEY/'  ~/.s3cfg
     export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
   fi
 }
