@@ -16,7 +16,8 @@ RUN apt-get update \
       zip \
       && apt-get clean all
 
-# Copy entrypoint script
+# Copy files
 COPY entrypoint.sh /
+COPY s3cfg /root/.s3cfg
 
 ENTRYPOINT ["/entrypoint.sh"]
