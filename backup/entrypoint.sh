@@ -32,11 +32,11 @@ function config_s3() {
   if [ "$AWS_HOST" != "false" ] && [ "$?" == "0" ]; then
     # If AWS_HOST is set and s3cmd is installed, configure it
     S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
-    sed -i -e 's/access_key =.*$/access_key = $AWS_ACCESS_KEY_ID/'  ~/.s3cfg
-    sed -i -e 's/bucket_location =.*$/bucket_location = $AWS_REGION/'  ~/.s3cfg
-    sed -i -e 's/host_base =.*$/host_base = $S3CMD_HOST/'  ~/.s3cfg
-    sed -i -e 's/host_bucket =.*$/host_bucket = %(bucket)s.$S3CMD_HOST/'  ~/.s3cfg
-    sed -i -e 's/secret_key =.*$/secret_key = $AWS_SECRET_ACCESS_KEY/'  ~/.s3cfg
+    sed -i -e "s/access_key =.*$/access_key = $AWS_ACCESS_KEY_ID/"  ~/.s3cfg
+    sed -i -e "s/bucket_location =.*$/bucket_location = $AWS_REGION/"  ~/.s3cfg
+    sed -i -e "s/host_base =.*$/host_base = $S3CMD_HOST/"  ~/.s3cfg
+    sed -i -e "s/host_bucket =.*$/host_bucket = %(bucket)s.$S3CMD_HOST/"  ~/.s3cfg
+    sed -i -e "s/secret_key =.*$/secret_key = $AWS_SECRET_ACCESS_KEY/"  ~/.s3cfg
     export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
   fi
 }
@@ -63,23 +63,23 @@ function backup() {
 function restore() {
   case "$1" in
     "odoo")
-      echo "Cleanup BACKUP database and filestore"
-      dropdb --if-exists BACKUP
-      s3cmd rm -r s3://$DO_SPACE/$RUNNING_ENV-BACKUP/
-      echo "Create BACKUP database"
-      createdb BACKUP
+      echo "Cleanup $PGDATABASE database and filestore"
+      dropdb --if-exists $PGDATABASE
+      s3cmd rm -r s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/
+      echo "Create $PGDATABASE database"
+      createdb $PGDATABASE
       echo "Download yesterday's backup"
       s3cmd get s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY.sql.gz /tmp/production-MASTER-$YESTERDAY.sql.gz
-      echo "Load it in BACKUP"
-      zcat /tmp/production-MASTER-$YESTERDAY.sql.gz | psql BACKUP
+      echo "Load it in $PGDATABASE"
+      zcat /tmp/production-MASTER-$YESTERDAY.sql.gz | psql $PGDATABASE
       echo "Deactivate the cron jobs and email servers"
       psql -c "
       UPDATE ir_cron SET active = 'f';
       UPDATE ir_mail_server SET active = 'f';
       UPDATE fetchmail_server SET active = 'f';
-      " BACKUP
+      " $PGDATABASE
       echo "Copy the filestore"
-      s3cmd cp -r s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV-BACKUP/
+      s3cmd cp -r s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/
       ;;
     *)
       echo "Restore profile does not exist. I don't know how to restore $1."

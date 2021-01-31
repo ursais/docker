@@ -6,16 +6,25 @@
 
 set -e
 
-# set the postgres database host, port, user and password according to the environment
-# and pass them as arguments to the odoo process if not present in the config file
+# Set default value to environment variables
+: ${RUNNING_ENV:='dev'}
+# PostgreSQL
 : ${HOST:=${DB_PORT_5432_TCP_ADDR:='db'}}
 : ${PORT:=${DB_PORT_5432_TCP_PORT:=5432}}
 : ${USER:=${DB_ENV_POSTGRES_USER:=${POSTGRES_USER:='odoo'}}}
 : ${PASSWORD:=${DB_ENV_POSTGRES_PASSWORD:=${POSTGRES_PASSWORD:='odoo'}}}
 : ${DEFAULTDB:=${DB_ENV_POSTGRES_DEFAULTDB:=${POSTGRES_DEFAULTDB:='postgres'}}}
+# MARABUNTA
 : ${MODE:=${MODE:='full'}}
+# ODOO
 : ${ODOO_ADMIN_PASSWD:='admin'}
-: ${RUNNING_ENV:='dev'}
+# ODOO SMTP
+: ${ODOO_SMTP_PASSWORD:='False'}
+: ${ODOO_SMTP_PORT:='25'}
+: ${ODOO_SMTP_SERVER:='localhost'}
+: ${ODOO_SMTP_SSL:='False'}
+: ${ODOO_SMTP_USER:='False'}
+# AWS / S3CMD
 : ${AWS_HOST:='false'}
 : ${AWS_REGION:='false'}
 : ${AWS_ACCESS_KEY_ID:='false'}
@@ -25,6 +34,7 @@ set -e
 DB_ARGS=()
 
 function check_config() {
+  echo "Check configuration"
   param="$1"
   value="$2"
   if grep -q -E "^\s*\b${param}\b\s*=" "$ODOO_RC" ; then
@@ -34,18 +44,39 @@ function check_config() {
   DB_ARGS+=("${value}")
 }
 
-function config_s3() {
+function config_s3cmd() {
+  echo "Configure s3cmd"
   command -v s3cmd > /dev/null 2>&1
   if [ "$AWS_HOST" != "false" ] && [ "$?" == "0" ]; then
     # If AWS_HOST is set and s3cmd is installed, configure it
     S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
-    sed -i -e 's/access_key =.*$/access_key = $AWS_ACCESS_KEY_ID/'  ~/.s3cfg
-    sed -i -e 's/bucket_location =.*$/bucket_location = $AWS_REGION/'  ~/.s3cfg
-    sed -i -e 's/host_base =.*$/host_base = $S3CMD_HOST/'  ~/.s3cfg
-    sed -i -e 's/host_bucket =.*$/host_bucket = %(bucket)s.$S3CMD_HOST/'  ~/.s3cfg
-    sed -i -e 's/secret_key =.*$/secret_key = $AWS_SECRET_ACCESS_KEY/'  ~/.s3cfg
+    sed -i -e "s/access_key =.*$/access_key = $AWS_ACCESS_KEY_ID/"  ~/.s3cfg
+    sed -i -e "s/bucket_location =.*$/bucket_location = $AWS_REGION/"  ~/.s3cfg
+    sed -i -e "s/host_base =.*$/host_base = $S3CMD_HOST/"  ~/.s3cfg
+    sed -i -e "s/host_bucket =.*$/host_bucket = %(bucket)s.$S3CMD_HOST/"  ~/.s3cfg
+    sed -i -e "s/secret_key =.*$/secret_key = $AWS_SECRET_ACCESS_KEY/"  ~/.s3cfg
     export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
   fi
+}
+
+function config_odoo() {
+  echo "Configure Odoo"
+  if [ "$ODOO_SMTP_SERVER" != "false" ]; then
+    sed -i -e "s/smtp_password =.*$/smtp_password = $ODOO_SMTP_PASSWORD/" "$ODOO_RC"
+    sed -i -e "s/smtp_port =.*$/smtp_port = $ODOO_SMTP_PORT/" "$ODOO_RC"
+    sed -i -e "s/smtp_server =.*$/smtp_server = $ODOO_SMTP_SERVER/" "$ODOO_RC"
+    sed -i -e "s/smtp_ssl =.*$/smtp_ssl = $ODOO_SMTP_SSL/" "$ODOO_RC"
+    sed -i -e "s/smtp_user =.*$/smtp_user = $ODOO_SMTP_USER/" "$ODOO_RC"
+  fi
+  # Set database configuration in odoo.conf
+  if [ "$HOST" != "false" ]; then
+    sed -i -e "s/db_host =.*$/db_host = $HOST/" "$ODOO_RC"
+    sed -i -e "s/db_password =.*$/db_password = $PASSWORD/" "$ODOO_RC"
+    sed -i -e "s/db_port =.*$/db_port = $PORT/" "$ODOO_RC"
+    sed -i -e "s/db_user =.*$/db_user = $USER/" "$ODOO_RC"
+  fi
+  sed -i -e "s/admin_passwd.*$/admin_passwd = $ODOO_ADMIN_PASSWD/" "$ODOO_RC"
+  sed -i -e '/db_name.*$/d' "$ODOO_RC"
 }
 
 function migrate() {
@@ -130,7 +161,8 @@ check_config "db_host" "$HOST"
 check_config "db_port" "$PORT"
 check_config "db_user" "$USER"
 check_config "db_password" "$PASSWORD"
-config_s3
+config_s3cmd
+config_odoo
 
 # shellcheck disable=SC2068
 wait-for-psql.py ${DB_ARGS[@]} --timeout=30 --db_name=${DEFAULTDB}
@@ -148,16 +180,8 @@ export MARABUNTA_DB_PORT=$PORT
 export MARABUNTA_DB_HOST=$HOST
 export MARABUNTA_MODE=$MODE
 # For anthem
-export OPENERP_SERVER=/etc/odoo/odoo.conf
+export OPENERP_SERVER=$ODOO_RC
 export ODOO_DATA_PATH=/odoo/data
-
-# Set database configuration in odoo.conf
-grep db_host $OPENERP_SERVER > /dev/null || echo "db_host = $HOST" >> $OPENERP_SERVER
-grep db_port $OPENERP_SERVER > /dev/null || echo "db_port = $PORT" >> $OPENERP_SERVER
-grep db_user $OPENERP_SERVER > /dev/null || echo "db_user = $USER" >> $OPENERP_SERVER
-grep db_password $OPENERP_SERVER > /dev/null || echo "db_password = $PASSWORD" >> $OPENERP_SERVER
-sed -i -e "s/admin_passwd.*$/admin_passwd = $ODOO_ADMIN_PASSWD/" $OPENERP_SERVER
-sed -i -e '/db_name.*$/d' $OPENERP_SERVER
 
 cd /odoo
 
@@ -184,10 +208,12 @@ else
       upgrade_existing
       duplicate
       ;;
-    *) # dev
+    "dev")
       drop LATEST
       create LATEST
       migrate LATEST
+      ;;
+    *)
       ;;
   esac
   
@@ -198,11 +224,11 @@ else
           if [[ "$1" == "scaffold" ]] ; then
               exec odoo "$@"
           else
-              exec odoo "$@" "${DB_ARGS[@]}"
+              exec odoo "$@"
           fi
           ;;
       -*)
-          exec odoo "$@" "${DB_ARGS[@]}"
+          exec odoo "$@"
           ;;
       *)
           exec "$@"
