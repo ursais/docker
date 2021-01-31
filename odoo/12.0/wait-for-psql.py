@@ -7,6 +7,8 @@ import time
 import psycopg2
 
 if __name__ == "__main__":
+    logging.info("Wait for database")
+
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("--db_host", required=True)
     arg_parser.add_argument("--db_port", required=True)
