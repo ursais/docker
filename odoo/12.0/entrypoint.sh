@@ -186,10 +186,12 @@ else
       upgrade_existing
       duplicate
       ;;
-    *) # dev
+    "dev")
       drop LATEST
       create LATEST
       migrate LATEST
+      ;;
+    *)
       ;;
   esac
   
@@ -200,11 +202,11 @@ else
           if [[ "$1" == "scaffold" ]] ; then
               exec odoo "$@"
           else
-              exec odoo "$@" "${DB_ARGS[@]}"
+              exec odoo "$@"
           fi
           ;;
       -*)
-          exec odoo "$@" "${DB_ARGS[@]}"
+          exec odoo "$@"
           ;;
       *)
           exec "$@"
