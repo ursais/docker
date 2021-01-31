@@ -27,6 +27,7 @@ export LASTWEEK=$(date -d "1 week ago" -u +%Y%m%d)
 
 # Functions
 function config_s3() {
+  echo "Configure s3cmd"
   command -v s3cmd > /dev/null 2>&1
   if [ "$AWS_HOST" != "false" ] && [ "$?" == "0" ]; then
     # If AWS_HOST is set and s3cmd is installed, configure it
@@ -43,14 +44,14 @@ function config_s3() {
 function backup() {
   case "$1" in
     "odoo")
-      # Dump the database
+      echo "Dump the database $PGDATABASE"
       pg_dump --clean $PGDATABASE | gzip > /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz
-      # Push it to the space
+      echo "Push it to the space"
       s3cmd put /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz s3://$DO_SPACE/backup/
-      # Duplicate the filestore
-      s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/ s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$TODAY/
-      # Cleanup last week backup
-      s3cmd rm --recursive s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$LASTWEEK/
+      echo "Duplicate the filestore"
+      s3cmd cp -r s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/ s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$TODAY/
+      echo "Cleanup last week backup"
+      s3cmd rm -r s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$LASTWEEK/
       s3cmd rm s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$LASTWEEK.sql.gz
       ;;
     *)
@@ -62,22 +63,23 @@ function backup() {
 function restore() {
   case "$1" in
     "odoo")
-      # Cleanup
+      echo "Cleanup BACKUP database and filestore"
       dropdb --if-exists BACKUP
-      s3cmd rm --recursive s3://$DO_SPACE/$RUNNING_ENV-BACKUP/
+      s3cmd rm -r s3://$DO_SPACE/$RUNNING_ENV-BACKUP/
+      echo "Create BACKUP database"
       createdb BACKUP
-      # Download the latest one
+      echo "Download yesterday's backup"
       s3cmd get s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY.sql.gz /tmp/production-MASTER-$YESTERDAY.sql.gz
-      # Load it in BACKUP
+      echo "Load it in BACKUP"
       zcat /tmp/production-MASTER-$YESTERDAY.sql.gz | psql BACKUP
-      # Deactivate the cron jobs and email servers
+      echo "Deactivate the cron jobs and email servers"
       psql -c "
       UPDATE ir_cron SET active = 'f';
       UPDATE ir_mail_server SET active = 'f';
       UPDATE fetchmail_server SET active = 'f';
       " BACKUP
-      # Copy the filestore
-      s3cmd cp --recursive s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV-BACKUP/
+      echo "Copy the filestore"
+      s3cmd cp -r s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV-BACKUP/
       ;;
     *)
       echo "Restore profile does not exist. I don't know how to restore $1."
