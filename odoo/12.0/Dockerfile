@@ -76,7 +76,7 @@ EXPOSE 8069 8072
 
 RUN pip3 install -r /odoo/requirements.txt
 
-RUN chown -R odoo /odoo /etc/odoo /mnt/extra-addons /var/lib/odoo
+RUN chown -R odoo /odoo /etc/odoo /mnt/extra-addons /var/lib/odoo/.s3cfg
 
 # Set the default config file
 ENV ODOO_RC /etc/odoo/odoo.conf
