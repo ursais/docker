@@ -31,19 +31,6 @@ set -e
 : ${AWS_SECRET_ACCESS_KEY:='false'}
 : ${AWS_BUCKETNAME:='false'}
 
-DB_ARGS=()
-
-function check_config() {
-  echo "Check configuration"
-  param="$1"
-  value="$2"
-  if grep -q -E "^\s*\b${param}\b\s*=" "$ODOO_RC" ; then
-      value=$(grep -E "^\s*\b${param}\b\s*=" "$ODOO_RC" | cut -d " " -f3 | sed 's/["\n\r]//g')
-  fi;
-  DB_ARGS+=("--${param}")
-  DB_ARGS+=("${value}")
-}
-
 function config_s3cmd() {
   echo "Configure s3cmd"
   command -v s3cmd > /dev/null 2>&1
@@ -157,15 +144,11 @@ function upgrade_existing () {
   done
 }
 
-check_config "db_host" "$HOST"
-check_config "db_port" "$PORT"
-check_config "db_user" "$USER"
-check_config "db_password" "$PASSWORD"
 config_s3cmd
 config_odoo
 
 # shellcheck disable=SC2068
-wait-for-psql.py ${DB_ARGS[@]} --timeout=30 --db_name=${DEFAULTDB}
+wait-for-psql.py --db_host=$HOST --db_port=$PORT --db_user=$USER --db_password=$PASSWORD --timeout=30 --db_name=${DEFAULTDB}
 
 # For psql, createdb and dropdb
 export PGHOST=$HOST
