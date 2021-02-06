@@ -9,21 +9,13 @@ set -e
 # Set default value to environment variables
 : ${RUNNING_ENV:='dev'}
 # PostgreSQL
-: ${HOST:=${DB_PORT_5432_TCP_ADDR:='db'}}
-: ${PORT:=${DB_PORT_5432_TCP_PORT:=5432}}
-: ${USER:=${DB_ENV_POSTGRES_USER:=${POSTGRES_USER:='odoo'}}}
-: ${PASSWORD:=${DB_ENV_POSTGRES_PASSWORD:=${POSTGRES_PASSWORD:='odoo'}}}
-: ${DEFAULTDB:=${DB_ENV_POSTGRES_DEFAULTDB:=${POSTGRES_DEFAULTDB:='postgres'}}}
+: ${PGHOST:='db'}}
+: ${PGPORT:=5432}}
+: ${PGUSER:='odoo'}}}
+: ${PGPASSWORD:='odoo'}}}
+: ${DEFAULTDB:='postgres'}}}
 # MARABUNTA
-: ${MODE:=${MODE:='full'}}
-# ODOO
-: ${ODOO_ADMIN_PASSWD:='admin'}
-# ODOO SMTP
-: ${ODOO_SMTP_PASSWORD:='False'}
-: ${ODOO_SMTP_PORT:='25'}
-: ${ODOO_SMTP_SERVER:='localhost'}
-: ${ODOO_SMTP_SSL:='False'}
-: ${ODOO_SMTP_USER:='False'}
+: ${MARABUNTA_MODE:='full'}}
 # AWS / S3CMD
 : ${AWS_HOST:='false'}
 : ${AWS_REGION:='false'}
@@ -37,41 +29,22 @@ function config_s3cmd() {
   if [ "$AWS_HOST" != "false" ] && [ "$?" == "0" ]; then
     # If AWS_HOST is set and s3cmd is installed, configure it
     S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
-    sed -i -e "s/access_key =.*$/access_key = $AWS_ACCESS_KEY_ID/"  ~/.s3cfg
-    sed -i -e "s/bucket_location =.*$/bucket_location = $AWS_REGION/"  ~/.s3cfg
-    sed -i -e "s/host_base =.*$/host_base = $S3CMD_HOST/"  ~/.s3cfg
-    sed -i -e "s/host_bucket =.*$/host_bucket = %(bucket)s.$S3CMD_HOST/"  ~/.s3cfg
-    sed -i -e "s/secret_key =.*$/secret_key = $AWS_SECRET_ACCESS_KEY/"  ~/.s3cfg
+    dockerize -template ~/.s3cfg.tmpl:~/.s3cfg
     export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
   fi
 }
 
 function config_odoo() {
   echo "Configure Odoo"
-  if [ "$ODOO_SMTP_SERVER" != "false" ]; then
-    sed -i -e "s/smtp_password =.*$/smtp_password = $ODOO_SMTP_PASSWORD/" "$ODOO_RC"
-    sed -i -e "s/smtp_port =.*$/smtp_port = $ODOO_SMTP_PORT/" "$ODOO_RC"
-    sed -i -e "s/smtp_server =.*$/smtp_server = $ODOO_SMTP_SERVER/" "$ODOO_RC"
-    sed -i -e "s/smtp_ssl =.*$/smtp_ssl = $ODOO_SMTP_SSL/" "$ODOO_RC"
-    sed -i -e "s/smtp_user =.*$/smtp_user = $ODOO_SMTP_USER/" "$ODOO_RC"
-  fi
-  # Set database configuration in odoo.conf
-  if [ "$HOST" != "false" ]; then
-    sed -i -e "s/db_host =.*$/db_host = $HOST/" "$ODOO_RC"
-    sed -i -e "s/db_password =.*$/db_password = $PASSWORD/" "$ODOO_RC"
-    sed -i -e "s/db_port =.*$/db_port = $PORT/" "$ODOO_RC"
-    sed -i -e "s/db_user =.*$/db_user = $USER/" "$ODOO_RC"
-  fi
-  sed -i -e "s/admin_passwd.*$/admin_passwd = $ODOO_ADMIN_PASSWD/" "$ODOO_RC"
-  sed -i -e '/db_name.*$/d' "$ODOO_RC"
+  dockerize -template $ODOO_RC.tmpl:$ODOO_RC
 }
 
 function migrate() {
   OLD=""
-  DB_EXIST=$(psql -X -A -t -h $HOST -p $PORT -U $USER $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
+  DB_EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$DB_EXIST" = "1" ]; then
     export PGDATABASE=$1
-    TABLE_EXIST=$(psql -X -A -t -h $HOST -p $PORT -U $USER -d $1 -c "
+    TABLE_EXIST=$(psql -X -A -t -d $1 -c "
       SELECT EXISTS(
         SELECT *
         FROM information_schema.tables
@@ -80,16 +53,16 @@ function migrate() {
           table_name='ir_config_parameter'
       )";)
     if [ "$TABLE_EXIST" = "1" ]; then
-      OLD=$(psql -X -A -t -h $HOST -p $PORT -U $USER -v ON_ERROR_STOP=1 -d $1 -c "SELECT value FROM ir_config_parameter WHERE key = 'database.version'" 2> /dev/null ;)
+      OLD=$(psql -X -A -t -v ON_ERROR_STOP=1 -d $1 -c "SELECT value FROM ir_config_parameter WHERE key = 'database.version'" 2> /dev/null ;)
     fi
   fi
   NEW=$(grep version= /odoo/setup.py | sed -e 's/^ *version="//' -e 's/",$//')
   if [ "$OLD" != "$NEW" ]; then
-    echo "db_name = $1" >> $OPENERP_SERVER
+    echo "db_name = $1" >> $ODOO_RC
     export MARABUNTA_DATABASE=$1
     [ "$OLD" != "" ] && export MARABUNTA_FORCE_VERSION=$NEW
     marabunta --allow-serie=True
-    sed -i -e '/db_name.*$/d' $OPENERP_SERVER
+    sed -i -e '/db_name.*$/d' $ODOO_RC
   fi
 }
 
@@ -148,22 +121,16 @@ config_s3cmd
 config_odoo
 
 # shellcheck disable=SC2068
-wait-for-psql.py --db_host=$HOST --db_port=$PORT --db_user=$USER --db_password=$PASSWORD --timeout=30 --db_name=${DEFAULTDB}
+wait-for-psql.py --db_host=$PGHOST --db_port=$PGPORT --db_user=$PGUSER --db_password=$PGPASSWORD --timeout=30 --db_name=${DEFAULTDB}
 
-# For psql, createdb and dropdb
-export PGHOST=$HOST
-export PGPORT=$PORT
-export PGUSER=$USER
-export PGPASSWORD=$PASSWORD
 # For Marabunta
 export MARABUNTA_MIGRATION_FILE=/odoo/migration.yml
-export MARABUNTA_DB_USER=$USER
-export MARABUNTA_DB_PASSWORD=$PASSWORD
-export MARABUNTA_DB_PORT=$PORT
-export MARABUNTA_DB_HOST=$HOST
+export MARABUNTA_DB_USER=$PGUSER
+export MARABUNTA_DB_PASSWORD=$PGPASSWORD
+export MARABUNTA_DB_PORT=$PGPORT
+export MARABUNTA_DB_HOST=$PGHOST
 export MARABUNTA_MODE=$MODE
 # For anthem
-export OPENERP_SERVER=$ODOO_RC
 export ODOO_DATA_PATH=/odoo/data
 
 cd /odoo
@@ -171,7 +138,7 @@ cd /odoo
 # Check if the 2nd command line argument is --test-enable
 if [ "$1" == "--test-enable" ] ; then
   # Change configuration of demo data
-  sed -i -e 's/without_demo = all/without_demo = False/g' $OPENERP_SERVER
+  sed -i -e 's/without_demo = all/without_demo = False/g' $ODOO_RC
   # Run odoo with all command line arguments
   # shellcheck disable=SC2145
   echo "Running Odoo with the following commands: odoo $@"

@@ -60,10 +60,10 @@ RUN mkdir -p /odoo && mkdir -p /mnt/extra-addons
 
 # Copy files
 COPY entrypoint.sh /
-COPY odoo.conf /etc/odoo/
+COPY odoo.conf.tmpl /etc/odoo/
 COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
-COPY s3cfg /var/lib/odoo/.s3cfg
+COPY s3cfg.tmpl /var/lib/odoo/.s3cfg.tmpl
 
 # Copy Odoo addons
 COPY src/odoo-cloud-platform/attachment_s3 /mnt/extra-addons/attachment_s3
