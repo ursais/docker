@@ -48,6 +48,11 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/
     && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
+# Install dockerize for config files
+RUN curl -o dockerize-linux-amd64-v0.6.0.tar.gz https://github.com/jwilder/dockerize/releases/download/v0.6.0/dockerize-linux-amd64-v0.6.0.tar.gz -SL \
+    && echo 'a13ff2aa6937f45ccde1f29b1574744930f5c9a5 dockerize-linux-amd64-v0.6.0.tar.gz' | sha1sum -c - \
+    && tar xvfz dockerize-linux-amd64-v0.6.0.tar.gz -C /usr/local/bin && rm dockerize-linux-amd64-v0.6.0.tar.gz
+
 # Install Odoo
 ENV ODOO_VERSION 12.0
 ARG ODOO_RELEASE=latest
@@ -56,27 +61,26 @@ RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/od
     && apt-get -y install --no-install-recommends ./odoo.deb \
     && rm -rf /var/lib/apt/lists/* odoo.deb
 
-RUN mkdir -p /odoo && mkdir -p /mnt/extra-addons
+RUN mkdir -p /odoo && mkdir -p /addons && mkdir /data
 
 # Copy files
 COPY entrypoint.sh /
-COPY odoo.conf.tmpl /etc/odoo/
+COPY templates /odoo/templates
 COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
-COPY s3cfg.tmpl /var/lib/odoo/.s3cfg.tmpl
 
 # Copy Odoo addons
-COPY src/odoo-cloud-platform/attachment_s3 /mnt/extra-addons/attachment_s3
-COPY src/odoo-cloud-platform/base_attachment_object_storage /mnt/extra-addons/base_attachment_object_storage
-COPY src/odoo-cloud-platform/monitoring_status /mnt/extra-addons/monitoring_status
-COPY src/odoo-cloud-platform/session_redis /mnt/extra-addons/session_redis
+COPY src/odoo-cloud-platform/attachment_s3 /addons/attachment_s3
+COPY src/odoo-cloud-platform/base_attachment_object_storage /addons/base_attachment_object_storage
+COPY src/odoo-cloud-platform/monitoring_status /addons/monitoring_status
+COPY src/odoo-cloud-platform/session_redis /addons/session_redis
 
 # Expose Odoo services
 EXPOSE 8069 8072
 
 RUN pip3 install -r /odoo/requirements.txt
 
-RUN chown -R odoo /odoo /etc/odoo /mnt/extra-addons /var/lib/odoo/.s3cfg
+RUN chown -R odoo /odoo /etc/odoo /addons /data
 
 # Set the default config file
 ENV ODOO_RC /etc/odoo/odoo.conf

@@ -8,6 +8,7 @@ set -e
 
 # Set default value to environment variables
 : ${RUNNING_ENV:='dev'}
+: ${TEMPLATES:='/odoo/templates'}
 # PostgreSQL
 : ${PGHOST:='db'}}
 : ${PGPORT:=5432}}
@@ -16,27 +17,17 @@ set -e
 : ${DEFAULTDB:='postgres'}}}
 # MARABUNTA
 : ${MARABUNTA_MODE:='full'}}
-# AWS / S3CMD
-: ${AWS_HOST:='false'}
-: ${AWS_REGION:='false'}
-: ${AWS_ACCESS_KEY_ID:='false'}
-: ${AWS_SECRET_ACCESS_KEY:='false'}
-: ${AWS_BUCKETNAME:='false'}
 
 function config_s3cmd() {
   echo "Configure s3cmd"
-  command -v s3cmd > /dev/null 2>&1
-  if [ "$AWS_HOST" != "false" ] && [ "$?" == "0" ]; then
-    # If AWS_HOST is set and s3cmd is installed, configure it
-    S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
-    dockerize -template ~/.s3cfg.tmpl:~/.s3cfg
-    export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
-  fi
+  export S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
+  dockerize -template $TEMPLATES/s3cfg.tmpl:$HOME/.s3cfg
+  export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
 }
 
 function config_odoo() {
   echo "Configure Odoo"
-  dockerize -template $ODOO_RC.tmpl:$ODOO_RC
+  dockerize -template $TEMPLATES/odoo.conf.tmpl:$ODOO_RC
 }
 
 function migrate() {

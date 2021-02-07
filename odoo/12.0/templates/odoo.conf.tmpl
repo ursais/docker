@@ -1,7 +1,7 @@
 [options]
-addons_path = {{ default .Env.ODOO_ADDONS_PATH "/mnt/addons" }}
+addons_path = {{ default .Env.ODOO_ADDONS_PATH "/addons" }}
 admin_passwd = {{ default .Env.ODOO_ADMIN_PASSWD "admin" }}
-data_dir = {{ default .Env.ODOO_DATA_DIR "/var/lib/odoo" }}
+data_dir = {{ default .Env.ODOO_DATA_DIR "/data" }}
 # Database
 db_host = {{ default .Env.PGHOST "db" }}
 db_name = {{ default .Env.PGDATABASE "False" }}
@@ -25,7 +25,7 @@ log_db = {{ default .Env.ODOO_LOG_DB "False" }}
 logrotate = {{ default .Env.ODOO_LOGROTATE "False" }}
 syslog = {{ default .Env.ODOO_SYSLOG "False" }}
 max_cron_threads = {{ default .Env.ODOO_MAX_CRON_THREADS "1" }}
-proxy_mode = {{ default .Env.ODOO_ PROXY_MODE "True" }}
+proxy_mode = {{ default .Env.ODOO_PROXY_MODE "True" }}
 server_wide_modules = {{ default .Env.ODOO_SERVER_WIDE_MODULES "web,attachment_s3,monitoring_status,session_redis" }}
 # SMTP
 smtp_password = {{ default .Env.ODOO_SMTP_PASSWORD "False" }}
