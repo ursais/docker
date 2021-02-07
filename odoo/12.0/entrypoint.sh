@@ -17,6 +17,7 @@ set -e
 : ${DEFAULTDB:='postgres'}
 # MARABUNTA
 : ${MARABUNTA_MODE:='full'}
+: ${MARABUNTA_ALLOW_SERIE:='false'}
 
 function config_s3cmd() {
   echo "Configure s3cmd"
@@ -32,28 +33,32 @@ function config_odoo() {
 
 function migrate() {
   OLD=""
-  DB_EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
+  export DB_NAME=$1
+  DB_EXIST=$(psql -X -A -t -d $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME'";)
   if [ "$DB_EXIST" = "1" ]; then
-    export PGDATABASE=$1
-    TABLE_EXIST=$(psql -X -A -t -d $1 -c "
+    TABLE_EXIST=$(psql -X -A -t -d $DB_NAME -c "
       SELECT EXISTS(
         SELECT *
         FROM information_schema.tables
         WHERE table_schema='public' AND
-          table_catalog='$1' AND
+          table_catalog='$DB_NAME' AND
           table_name='ir_config_parameter'
       )";)
     if [ "$TABLE_EXIST" = "1" ]; then
-      OLD=$(psql -X -A -t -v ON_ERROR_STOP=1 -d $1 -c "SELECT value FROM ir_config_parameter WHERE key = 'database.version'" 2> /dev/null ;)
+      OLD=$(psql -X -A -t -v ON_ERROR_STOP=1 -d $DB_NAME -c "SELECT value FROM ir_config_parameter WHERE key = 'database.version'" 2> /dev/null ;)
     fi
   fi
   NEW=$(grep version= /odoo/setup.py | sed -e 's/^ *version="//' -e 's/",$//')
   if [ "$OLD" != "$NEW" ]; then
-    sed -i -e "db_name = $1" $ODOO_RC
-    export MARABUNTA_DATABASE=$1
+    sed -i -e "s/db_name =.*/db_name = $DB_NAME/" "$ODOO_RC"
+    OLD_PGDATABASE=$PGDATABASE
+    export MARABUNTA_DATABASE=$DB_NAME
+    export PGDATABASE=$DB_NAME
     [ "$OLD" != "" ] && export MARABUNTA_FORCE_VERSION=$NEW
-    marabunta --allow-serie=True
-    sed -i -e '/db_name = $PGDATABASE/' $ODOO_RC
+    echo "Migrating $DB_NAME"
+    marabunta
+    sed -i -e "s/db_name =.*/db_name = $OLD_PGDATABASE/" "$ODOO_RC"
+    export PGDATABASE=$OLD_PGDATABASE
   fi
 }
 
