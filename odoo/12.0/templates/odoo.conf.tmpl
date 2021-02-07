@@ -1,0 +1,38 @@
+[options]
+addons_path = {{ default .Env.ODOO_ADDONS_PATH "/addons" }}
+admin_passwd = {{ default .Env.ODOO_ADMIN_PASSWD "admin" }}
+data_dir = {{ default .Env.ODOO_DATA_DIR "/data" }}
+# Database
+db_host = {{ default .Env.PGHOST "db" }}
+db_name = {{ default .Env.PGDATABASE "False" }}
+db_password = {{ default .Env.PGPASSWORD "odoo" }}
+db_port = {{ default .Env.PGPORT "5432" }}
+db_user = {{ default .Env.PGUSER "odoo" }}
+dbfilter = {{ default .Env.ODOO_DBFILTER "^[^BACKUP|defaultdb].*$" }}
+list_db = {{ default .Env.ODOO_LIST_DB "False" }}
+# Limits
+limit_memory_hard = {{ default .Env.ODOO_LIMIT_MEMORY_HARD "4294967296" }}
+limit_memory_soft = {{ default .Env.ODOO_LIMIT_MEMORY_SOFT "2147483648" }}
+limit_request = {{ default .Env.ODOO_LIMIT_REQUEST "8192" }}
+limit_time_cpu = {{ default .Env.ODOO_LIMIT_TIME_CPU "1800" }}
+limit_time_real = {{ default .Env.ODOO_LIMIT_TIME_REAL "1800" }}
+limit_time_real_cron = {{ default .Env.ODOO_LIMIT_TIME_REAL_CRON "120" }}
+# Logs
+log_handler = {{ default .Env.ODOO_LOG_HANDLER "':INFO'" }}
+log_level = {{ default .Env.ODOO_LOG_LEVEL "info" }}
+logfile = {{ default .Env.ODOO_LOGFILE "None" }}
+log_db = {{ default .Env.ODOO_LOG_DB "False" }}
+logrotate = {{ default .Env.ODOO_LOGROTATE "False" }}
+syslog = {{ default .Env.ODOO_SYSLOG "False" }}
+max_cron_threads = {{ default .Env.ODOO_MAX_CRON_THREADS "1" }}
+proxy_mode = {{ default .Env.ODOO_PROXY_MODE "True" }}
+server_wide_modules = {{ default .Env.ODOO_SERVER_WIDE_MODULES "web,attachment_s3,monitoring_status,session_redis" }}
+# SMTP
+smtp_password = {{ default .Env.ODOO_SMTP_PASSWORD "False" }}
+smtp_port = {{ default .Env.ODOO_SMTP_PORT "25" }}
+smtp_server = {{ default .Env.ODOO_SMTP_SERVER "localhost" }}
+smtp_ssl = {{ default .Env.ODOO_SMTP_SSL "False" }}
+smtp_user = {{ default .Env.ODOO_SMTP_USER "False" }}
+unaccent = {{ default .Env.ODOO_UNACCENT "False" }}
+without_demo = {{ default .Env.ODOO_WITHOUT_DEMO "all" }}
+workers = {{ default .Env.ODOO_WORKERS "3" }}
