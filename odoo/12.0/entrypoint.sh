@@ -8,15 +8,15 @@ set -e
 
 # Set default value to environment variables
 : ${RUNNING_ENV:='dev'}
-: ${TEMPLATES:='/odoo/templates'}
 # PostgreSQL
-: ${PGHOST:='db'}}
-: ${PGPORT:=5432}}
-: ${PGUSER:='odoo'}}}
-: ${PGPASSWORD:='odoo'}}}
-: ${DEFAULTDB:='postgres'}}}
+: ${PGHOST:='db'}
+: ${PGPORT:=5432}
+: ${PGUSER:='odoo'}
+: ${PGPASSWORD:='odoo'}
+: ${PGDATABASE:='False'}
+: ${DEFAULTDB:='postgres'}
 # MARABUNTA
-: ${MARABUNTA_MODE:='full'}}
+: ${MARABUNTA_MODE:='full'}
 
 function config_s3cmd() {
   echo "Configure s3cmd"
@@ -49,11 +49,11 @@ function migrate() {
   fi
   NEW=$(grep version= /odoo/setup.py | sed -e 's/^ *version="//' -e 's/",$//')
   if [ "$OLD" != "$NEW" ]; then
-    echo "db_name = $1" >> $ODOO_RC
+    sed -i -e "db_name = $1" $ODOO_RC
     export MARABUNTA_DATABASE=$1
     [ "$OLD" != "" ] && export MARABUNTA_FORCE_VERSION=$NEW
     marabunta --allow-serie=True
-    sed -i -e '/db_name.*$/d' $ODOO_RC
+    sed -i -e '/db_name = $PGDATABASE/' $ODOO_RC
   fi
 }
 
@@ -108,21 +108,22 @@ function upgrade_existing () {
   done
 }
 
-config_s3cmd
-config_odoo
-
-# shellcheck disable=SC2068
-wait-for-psql.py --db_host=$PGHOST --db_port=$PGPORT --db_user=$PGUSER --db_password=$PGPASSWORD --timeout=30 --db_name=${DEFAULTDB}
-
+# For dockerize
+export TEMPLATES=/odoo/templates
 # For Marabunta
 export MARABUNTA_MIGRATION_FILE=/odoo/migration.yml
 export MARABUNTA_DB_USER=$PGUSER
 export MARABUNTA_DB_PASSWORD=$PGPASSWORD
 export MARABUNTA_DB_PORT=$PGPORT
 export MARABUNTA_DB_HOST=$PGHOST
-export MARABUNTA_MODE=$MODE
 # For anthem
 export ODOO_DATA_PATH=/odoo/data
+
+config_s3cmd
+config_odoo
+
+# shellcheck disable=SC2068
+wait-for-psql.py --db_host=$PGHOST --db_port=$PGPORT --db_user=$PGUSER --db_password=$PGPASSWORD --timeout=30 --db_name=${DEFAULTDB}
 
 cd /odoo
 
