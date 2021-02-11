@@ -18,6 +18,6 @@ RUN apt-get update \
 
 # Copy files
 COPY entrypoint.sh /
-COPY s3cfg /root/.s3cfg
+COPY templates /templates
 
 ENTRYPOINT ["/entrypoint.sh"]

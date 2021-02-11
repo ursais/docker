@@ -24,21 +24,15 @@ set -e
 export TODAY=$(date -u +%Y%m%d)
 export YESTERDAY=$(date -d "1 day ago" -u +%Y%m%d)
 export LASTWEEK=$(date -d "1 week ago" -u +%Y%m%d)
+# For dockerize
+export TEMPLATES=/templates
 
 # Functions
 function config_s3() {
   echo "Configure s3cmd"
-  command -v s3cmd > /dev/null 2>&1
-  if [ "$AWS_HOST" != "false" ] && [ "$?" == "0" ]; then
-    # If AWS_HOST is set and s3cmd is installed, configure it
-    S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
-    sed -i -e "s/access_key =.*$/access_key = $AWS_ACCESS_KEY_ID/"  ~/.s3cfg
-    sed -i -e "s/bucket_location =.*$/bucket_location = $AWS_REGION/"  ~/.s3cfg
-    sed -i -e "s/host_base =.*$/host_base = $S3CMD_HOST/"  ~/.s3cfg
-    sed -i -e "s/host_bucket =.*$/host_bucket = %(bucket)s.$S3CMD_HOST/"  ~/.s3cfg
-    sed -i -e "s/secret_key =.*$/secret_key = $AWS_SECRET_ACCESS_KEY/"  ~/.s3cfg
-    export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
-  fi
+  export S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
+  dockerize -template $TEMPLATES/s3cfg.tmpl:$HOME/.s3cfg
+  export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
 }
 
 function backup() {
