@@ -9,6 +9,7 @@ ENV LANG C.UTF-8
 RUN apt-get update \
   && apt-get upgrade -y \
   && apt-get install -y --no-install-recommends \
+    ca-certificates \
     curl \
     htop \
     tar \
