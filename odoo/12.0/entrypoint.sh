@@ -69,7 +69,7 @@ function duplicate() {
     # TODO: Build DB_NAME with the tag of the image
     export DB_NAME=$(date -u +'%Y%m%d')
     TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
-    # Create one YYYYMMDD database per day
+    # Create one YYYYMMDD database per day and migrate it
     if [ "$TODAY" != "1" ] ; then
       echo "Duplicating BACKUP to $DB_NAME"
       psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE \"BACKUP\"";
@@ -78,8 +78,8 @@ function duplicate() {
       else
         s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV-BACKUP/ s3://$DO_SPACE/$RUNNING_ENV-$DB_NAME/
       fi
+      migrate $DB_NAME
     fi
-    migrate $DB_NAME
   fi
 }
 
