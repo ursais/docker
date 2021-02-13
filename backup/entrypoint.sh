@@ -43,7 +43,7 @@ function backup() {
       echo "Push it to the space"
       s3cmd put /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz s3://$DO_SPACE/backup/
       echo "Duplicate the filestore"
-      s3cmd cp -r s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/ s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$TODAY/
+      s3cmd sync s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/ s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$TODAY/
       echo "Cleanup last week backup"
       s3cmd rm -r s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$LASTWEEK/
       s3cmd rm s3://$DO_SPACE/backup/$RUNNING_ENV-$PGDATABASE-$LASTWEEK.sql.gz
@@ -73,7 +73,7 @@ function restore() {
       UPDATE fetchmail_server SET active = 'f';
       " $PGDATABASE
       echo "Copy the filestore"
-      s3cmd cp -r s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/
+      s3cmd sync s3://$DO_SPACE/backup/production-MASTER-$YESTERDAY/ s3://$DO_SPACE/$RUNNING_ENV-$PGDATABASE/
       ;;
     *)
       echo "Restore profile does not exist. I don't know how to restore $1."

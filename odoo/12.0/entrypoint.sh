@@ -76,7 +76,7 @@ function duplicate() {
       if [ "$AWS_HOST" == "false" ]; then
         cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
       else
-        s3cmd cp --recursive s3://$DO_SPACE/$RUNNING_ENV-BACKUP/ s3://$DO_SPACE/$RUNNING_ENV-$DB_NAME/
+        s3cmd sync s3://$DO_SPACE/$RUNNING_ENV-BACKUP/ s3://$DO_SPACE/$RUNNING_ENV-$DB_NAME/
       fi
       migrate $DB_NAME
     fi
