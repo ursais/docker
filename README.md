@@ -1,32 +1,34 @@
 # OSI Docker Images
 
-## Table of Contents
-* [Apache](https://github.com/ursais/docker#Apache)
-* [CentOS](https://github.com/ursais/docker#CentOS)
-* [Debian](https://github.com/ursais/docker#Debian)
-* [Odoo](https://github.com/ursais/docker#Odoo)
-* [Nginx](https://github.com/ursais/docker#Nginx)
-* [PostgreSQL](https://github.com/ursais/docker#PostgreSQL)
-* [ProFTPD](https://github.com/ursais/docker#ProFTPD)
-* [Red Hat](https://github.com/ursais/docker#Red-Hat)
-* [Tools](https://github.com/ursais/docker#Tools)
-* [Ubuntu](https://github.com/ursais/docker#Ubuntu)
+# Table of Contents
+* [Applications](https://github.com/ursais/docker#Applications)
+  * [Apache](https://github.com/ursais/docker#Apache)
+  * [FrePPle](https://github.com/ursais/docker#FrePPle)
+  * [Odoo](https://github.com/ursais/docker#Odoo)
+  * [Nginx](https://github.com/ursais/docker#Nginx)
+  * [PostgreSQL](https://github.com/ursais/docker#PostgreSQL)
+  * [ProFTPD](https://github.com/ursais/docker#ProFTPD)
+  * [Tools](https://github.com/ursais/docker#Tools)
+* [Operating Systems](https://github.com/ursais/docker#Operating-Systems)
+  * [CentOS](https://github.com/ursais/docker#CentOS)
+  * [Debian](https://github.com/ursais/docker#Debian)
+  * [Red Hat](https://github.com/ursais/docker#Red-Hat)
+  * [Ubuntu](https://github.com/ursais/docker#Ubuntu)
 * [Support](https://github.com/ursais/docker#Support)
 
 This repository contains Dockerfile files used to build solutions provided by
 [Open Source Integrators](https://www.opensourceintegrators.com).
 
+
+# Applications
+
 ## Apache
 
 * [2](https://github.com/ursais/docker/blob/master/apache/2/Dockerfile) (Todo)
 
-## CentOS
+## FrePPle
 
-* [8](https://github.com/ursais/docker/blob/master/centos/8/Dockerfile)
-
-## Debian
-
-* [10](https://github.com/ursais/docker/blob/master/debian/10/Dockerfile)
+* [6](https://github.com/ursais/docker/blob/master/frepple/6/Dockerfile)
 
 ## Odoo
 
@@ -46,21 +48,31 @@ This repository contains Dockerfile files used to build solutions provided by
 
 * [1](https://github.com/ursais/docker/blob/master/proftpd/1/Dockerfile) (Todo)
 
-## Red Hat
-
-* [8](https://github.com/ursais/docker/blob/master/redhat/8/Dockerfile)
-
 ## Tools
 
 * [Backup](https://github.com/ursais/docker/blob/master/backup/Dockerfile)
 * [MailHog](https://github.com/ursais/docker/blob/master/mailhog/Dockerfile) (Todo)
+
+# Operating Systems
+
+## CentOS
+
+* [8](https://github.com/ursais/docker/blob/master/centos/8/Dockerfile)
+
+## Debian
+
+* [10](https://github.com/ursais/docker/blob/master/debian/10/Dockerfile)
+
+## Red Hat
+
+* [8](https://github.com/ursais/docker/blob/master/redhat/8/Dockerfile)
 
 ## Ubuntu
 
 * [18.04](https://github.com/ursais/docker/blob/master/ubuntu/18.04/Dockerfile)
 * [20.04](https://github.com/ursais/docker/blob/master/ubuntu/20.04/Dockerfile)
 
-## Support
+# Support
 
 Report any problem or question by creating an issue on the
 [GitHub project](https://github.com/ursais/docker/issues).
