@@ -1,0 +1,11 @@
+name: postgresql
+postgresqlPostgresPassword:
+postgresqlUsername: postgres
+defaultdb: postgres
+
+annotations:
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 2Gi
