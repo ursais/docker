@@ -181,7 +181,51 @@ MIDDLEWARE = (
 # Installed applications.
 # The order is important: urls, templates and menus of the earlier entries
 # take precedence over and override later entries.
-INSTALLED_APPS = {{ default .Env.FREPPLE_INSTALLED_APPS "('django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.messages', 'django.contrib.staticfiles', 'freppledb.boot', 'freppledb.wizard', 'freppledb.input', 'freppledb.output', 'freppledb.metrics', 'freppledb.execute', 'freppledb.common', 'django_filters', 'rest_framework', 'django_admin_bootstrapped', 'django.contrib.admin', 'freppledb.archive', 'freppledb.reportmanager', 'freppledb.executesql')" }}
+INSTALLED_APPS = (
+  'django.contrib.auth',
+  'django.contrib.contenttypes',
+  'django.contrib.messages',
+  'django.contrib.staticfiles',
+  'freppledb.boot',
+  {{ default .Env.FREPPLE_INSTALLED_APPS_CUSTOM "" }} << ADD YOUR CUSTOM EXTENSION APPS HERE
+  'freppledb.wizard',              << COMMENT IF MODEL BUILDING WIZARD ISN'T NEEDED
+  'freppledb.quoting',
+  {{ if .Env.FREPPLE_INSTALLED_APPS_FORECASTING }}
+  'freppledb.demandhits',
+  {{ end }}
+  'freppledb.input',
+  {{ if .Env.FREPPLE_INSTALLED_APPS_FORECASTING }}
+  'freppledb.forecast',          # << COMMENT IF YOU DON'T NEED THE FORECASTING MODULE
+  {{ end }}
+  {{ if .Env.FREPPLE_INSTALLED_APPS_INVENTORY }}
+  'freppledb.inventoryplanning', # << COMMENT IF YOU DON'T NEED THE INVENTORY PLANNING MODULE
+  {{ end }}
+  {{ if .Env.FREPPLE_INSTALLED_APPS_ODOO }}
+  'freppledb.odoo',             # << UNCOMMENT TO ACTIVATE THE ODOO INTEGRATION
+  {{ end }}
+  {{ if .Env.FREPPLE_INSTALLED_APPS_ERP }}
+  'freppledb.erpconnection',    # << UNCOMMENT TO ACTIVATE THE GENERIC ERP INTEGRATION
+  {{ end }}
+  {{ if .Env.FREPPLE_INSTALLED_APPS_OPENBRAVO }}
+  'freppledb.openbravo',        # << UNCOMMENT TO ACTIVATE THE OPENBRAVO INTEGRATION
+  {{ end }}
+  'freppledb.planningboard',
+  {{ if .Env.FREPPLE_INSTALLED_APPS_FORECASTING }}
+  'freppledb.webservice',        # << UNCOMMENT WHEN USING FORECASTING, QUOTING OR INVENTORY PLANNING APP
+  {{ end }}
+  'freppledb.metrics',
+  'freppledb.output',
+  'freppledb.execute',
+  'freppledb.common',
+  'django_filters',
+  'rest_framework',
+  'django_admin_bootstrapped',
+  'django.contrib.admin',
+  # The next two apps allow users to run their own SQL statements on
+  # the database, using the SQL_ROLE configured above.
+  'freppledb.reportmanager',
+  'freppledb.executesql',
+)
 
 # Custom attribute fields in the database
 # After each change of this setting, the following commands MUST be
