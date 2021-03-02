@@ -14,7 +14,7 @@ export DEFAULTDB="${DEFAULTDB:=postgres}"
 
 # Functions
 function config_frepple() {
-  echo "Configure FrePPle"
+  echo "Configure FrePPLe"
   dockerize -template $TEMPLATES/djangosettings.py.tmpl:/etc/frepple/djangosettings.py
 }
 
