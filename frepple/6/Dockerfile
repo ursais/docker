@@ -16,10 +16,6 @@ RUN apt-get update \
 
 # Configure Apache
 RUN a2enmod expires \
-#  && a2enmod proxy             # Only Enterprise Edition
-#  && a2enmod proxy_wstunnel    # Only Enterprise Edition
-#  && a2enmod default-ssl \
-#  && a2enmod ssl \
   && a2ensite z_frepple \
   && a2enmod wsgi
 
@@ -32,7 +28,7 @@ COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 # Install python3 modules
 RUN pip3 install -r /frepple/requirements.txt
 
-# Expose FrePPle
+# Expose FrePPLe
 EXPOSE 80
 
 ENTRYPOINT ["/entrypoint.sh"]
