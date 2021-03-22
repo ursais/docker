@@ -58,7 +58,7 @@ DATABASES = {
             os.path.join(FREPPLE_LOGDIR, "data", "default")
         ),
         "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
-        "SECRET_WEBTOKEN_KEY": {{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }},
+        "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
     },
     "scenario1": {
         "ENGINE": "django.db.backends.postgresql",
@@ -76,7 +76,7 @@ DATABASES = {
             os.path.join(FREPPLE_LOGDIR, "data", "scenario1")
         ),
         "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
-        "SECRET_WEBTOKEN_KEY": {{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }},
+        "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
     },
     "scenario2": {
         "ENGINE": "django.db.backends.postgresql",
@@ -94,7 +94,7 @@ DATABASES = {
             os.path.join(FREPPLE_LOGDIR, "data", "scenario2")
         ),
         "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
-        "SECRET_WEBTOKEN_KEY": {{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }},
+        "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
     },
     "scenario3": {
         "ENGINE": "django.db.backends.postgresql",
@@ -112,7 +112,7 @@ DATABASES = {
             os.path.join(FREPPLE_LOGDIR, "data", "scenario3")
         ),
         "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
-        "SECRET_WEBTOKEN_KEY": {{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }},
+        "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
     },
 }
 
