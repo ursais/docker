@@ -3,7 +3,7 @@
 # Table of Contents
 * [Applications](https://github.com/ursais/docker#Applications)
   * [Apache](https://github.com/ursais/docker#Apache)
-  * [FrePPle](https://github.com/ursais/docker#FrePPle)
+  * [FrePPLe](https://github.com/ursais/docker#FrePPLe)
   * [Odoo](https://github.com/ursais/docker#Odoo)
   * [Nginx](https://github.com/ursais/docker#Nginx)
   * [PostgreSQL](https://github.com/ursais/docker#PostgreSQL)
@@ -26,7 +26,7 @@ This repository contains Dockerfile files used to build solutions provided by
 
 * [2](https://github.com/ursais/docker/blob/master/apache/2/Dockerfile) (Todo)
 
-## FrePPle
+## FrePPLe
 
 * [6](https://github.com/ursais/docker/blob/master/frepple/6/Dockerfile)
 
