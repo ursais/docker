@@ -96,7 +96,7 @@ function create() {
 function drop() {
   echo "Dropping $1"
   dropdb --if-exists $1
-  if [ "$AWS_HOST" == "false" ]; then
+  if [[ -z "$AWS_HOST" ]]; then
     rm -Rf $ODOO_DATA_DIR/filestore/$1
   else
     s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV-$1/
