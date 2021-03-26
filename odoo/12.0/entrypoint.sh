@@ -8,6 +8,8 @@ set -e
 
 # Set default value to environment variables
 : ${RUNNING_ENV:='dev'}
+# Odoo
+: ${ODOO_DATA_DIR:='/data'}
 # PostgreSQL
 : ${PGHOST:='db'}
 : ${PGPORT:=5432}
@@ -74,7 +76,7 @@ function duplicate() {
       echo "Duplicating BACKUP to $DB_NAME"
       psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE \"BACKUP\"";
       if [ "$AWS_HOST" == "false" ]; then
-        cp -R /var/lib/odoo/filestore/BACKUP /var/lib/odoo/filestore/$DB_NAME
+        cp -R $ODOO_DATA_DIR/filestore/BACKUP $ODOO_DATA_DIR/filestore/$DB_NAME
       else
         s3cmd sync s3://$DO_SPACE/$RUNNING_ENV-BACKUP/ s3://$DO_SPACE/$RUNNING_ENV-$DB_NAME/
       fi
@@ -95,7 +97,7 @@ function drop() {
   echo "Dropping $1"
   dropdb --if-exists $1
   if [ "$AWS_HOST" == "false" ]; then
-    rm -Rf /var/lib/odoo/filestore/$1
+    rm -Rf $ODOO_DATA_DIR/filestore/$1
   else
     s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV-$1/
   fi
@@ -124,7 +126,7 @@ export MARABUNTA_DB_HOST=$PGHOST
 # For anthem
 export ODOO_DATA_PATH=/odoo/data
 
-config_s3cmd
+[[ -z "$AWS_HOST" ]] || config_s3cmd
 config_odoo
 
 # shellcheck disable=SC2068
