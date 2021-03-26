@@ -12,6 +12,7 @@ RUN apt-get update \
     ca-certificates \
     curl \
     htop \
+    iotop \
     tar \
     vim \
   && apt-get clean all \
