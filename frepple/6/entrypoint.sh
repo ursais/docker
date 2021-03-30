@@ -33,10 +33,13 @@ wait-for-psql.py
 EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$PGDATABASE'";)
 if [ "$EXIST" != "1" ];
 then
-  echo "Creating $PGDATABASE database"
+  echo "Creating $PGDATABASE databases"
   createdb $PGDATABASE
-  echo "Create FrePPle database schema"
+  echo "Create FrePPLe databases"
   frepplectl migrate --noinput
+  frepplectl createdatabase --database=scenario1
+  frepplectl createdatabase --database=scenario2
+  frepplectl createdatabase --database=scenario3
 fi
 
 echo "Start Apache 2"
