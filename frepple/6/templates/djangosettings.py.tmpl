@@ -59,7 +59,7 @@ DATABASES = {
         ),
         "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
         "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
-        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_DEFAULT "127.0.0.1:8000" }}"
+        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_DEFAULT "127.0.0.1:8002" }}"
     },
     "scenario1": {
         "ENGINE": "django.db.backends.postgresql",
@@ -78,7 +78,7 @@ DATABASES = {
         ),
         "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
         "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
-        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO1 "127.0.0.1:8001" }}"
+        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO1 "127.0.0.1:8003" }}"
     },
     "scenario2": {
         "ENGINE": "django.db.backends.postgresql",
@@ -97,7 +97,7 @@ DATABASES = {
         ),
         "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
         "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
-        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO2 "127.0.0.1:8002" }}"
+        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO2 "127.0.0.1:8004" }}"
     },
     "scenario3": {
         "ENGINE": "django.db.backends.postgresql",
@@ -116,7 +116,7 @@ DATABASES = {
         ),
         "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
         "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
-        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO3 "127.0.0.1:8003" }}"
+        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO3 "127.0.0.1:8005" }}"
     },
 }
 
