@@ -1,7 +1,7 @@
 FROM ursa/ubuntu-18.04:latest
 MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
-# Install FrePPle
+# Install FrePPLe
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gcc \
