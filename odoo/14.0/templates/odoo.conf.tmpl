@@ -5,6 +5,7 @@ csv_internal_sep = {{ default .Env.ODOO_CSV_INTERNAL_SEP "," }}
 data_dir = {{ default .Env.ODOO_DATA_DIR "/odoo/data" }}
 dbfilter = {{ default .Env.ODOO_DBFILTER "^[^BACKUP|defaultdb].*$" }}
 db_host = {{ default .Env.PGHOST "db" }}
+db_maintenance = {{ default .Env.ODOO_DB_MAINTENANCE "postgres" }}
 db_maxconn = {{ default .Env.ODOO_DB_MAXCONN "64" }}
 db_name = {{ default .Env.PGDATABASE "False" }}
 db_password = {{ default .Env.PGPASSWORD "odoo" }}
