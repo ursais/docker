@@ -89,7 +89,7 @@ function create() {
   EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$EXIST" != "1" ]; then
     echo "Creating $1"
-    createdb $1
+    createdb --maintenance-db=$DEFAULTDB $1
   fi
 }
 
