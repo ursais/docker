@@ -9,7 +9,7 @@ set -e
 # Set default value to environment variables
 : ${RUNNING_ENV:='dev'}
 # Odoo
-: ${ODOO_DATA_DIR:='/data'}
+: ${ODOO_DATA_DIR:='/odoo/data'}
 # PostgreSQL
 : ${PGHOST:='db'}
 : ${PGPORT:=5432}
@@ -124,7 +124,7 @@ export MARABUNTA_DB_PASSWORD=$PGPASSWORD
 export MARABUNTA_DB_PORT=$PGPORT
 export MARABUNTA_DB_HOST=$PGHOST
 # For anthem
-export ODOO_DATA_PATH=/odoo/data
+export ODOO_DATA_PATH=/odoo/songs/data
 
 [[ -z "$AWS_HOST" ]] || config_s3cmd
 config_odoo

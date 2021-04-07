@@ -47,7 +47,7 @@ RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/od
     && apt-get -y install --no-install-recommends ./odoo.deb \
     && rm -rf /var/lib/apt/lists/* odoo.deb
 
-RUN mkdir -p /odoo/addons /data
+RUN mkdir -p /odoo/addons /odoo/data
 
 # Copy entrypoint script and Odoo configuration file
 COPY entrypoint.sh /
@@ -66,7 +66,7 @@ EXPOSE 8069 8072
 
 RUN pip3 install -r /odoo/requirements.txt
 
-RUN chown -R odoo /etc/odoo /odoo /data
+RUN chown -R odoo /etc/odoo /odoo
 
 # Set the default config file
 ENV ODOO_RC /etc/odoo/odoo.conf
