@@ -51,7 +51,7 @@ RUN mkdir -p /odoo/addons /data
 
 # Copy entrypoint script and Odoo configuration file
 COPY entrypoint.sh /
-COPY odoo.conf /etc/odoo/
+COPY templates /odoo/templates
 COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
