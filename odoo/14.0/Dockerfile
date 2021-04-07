@@ -5,7 +5,6 @@ MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
-        curl \
         dirmngr \
         fonts-noto-cjk \
         gnupg \
@@ -25,6 +24,7 @@ RUN apt-get update \
         python3-wheel \
         python3-xlrd \
         python3-xlwt \
+        s3cmd \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.focal_amd64.deb \
     && echo 'ae4e85641f004a2097621787bf4381e962fb91e1 wkhtmltox.deb' | sha1sum -c - \
@@ -33,13 +33,7 @@ RUN apt-get update \
 
 # install latest postgresql-client
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
-    && GNUPGHOME="$(mktemp -d)" \
-    && export GNUPGHOME \
-    && repokey='B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8' \
-    && gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "${repokey}" \
-    && gpg --batch --armor --export "${repokey}" > /etc/apt/trusted.gpg.d/pgdg.gpg.asc \
-    && gpgconf --kill all \
-    && rm -rf "$GNUPGHOME" \
+    && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update  \
     && apt-get install --no-install-recommends -y postgresql-client \
     && rm -f /etc/apt/sources.list.d/pgdg.list \
@@ -47,15 +41,13 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main' > /etc/a
 
 # Install Odoo
 ENV ODOO_VERSION 14.0
-ARG ODOO_RELEASE=20210129
-ARG ODOO_SHA=1ab63f2c5086619f2c6ca98600c75c75388f0585
+ARG ODOO_RELEASE=latest
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
-    && echo "${ODOO_SHA} odoo.deb" | sha1sum -c - \
     && apt-get update \
     && apt-get -y install --no-install-recommends ./odoo.deb \
     && rm -rf /var/lib/apt/lists/* odoo.deb
 
-RUN mkdir -p /odoo && mkdir -p /mnt/extra-addons
+RUN mkdir -p /odoo/addons /data
 
 # Copy entrypoint script and Odoo configuration file
 COPY entrypoint.sh /
@@ -64,17 +56,17 @@ COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Copy Odoo addons
-COPY src/odoo-cloud-platform/monitoring_status /mnt/extra-addons/monitoring_status
-
-# Mount /var/lib/odoo to allow restoring filestore
-VOLUME ["/var/lib/odoo"]
+COPY src/odoo-cloud-platform/attachment_s3 /odoo/addons/attachment_s3
+COPY src/odoo-cloud-platform/base_attachment_object_storage /odoo/addons/base_attachment_object_storage
+COPY src/odoo-cloud-platform/monitoring_status /odoo/addons/monitoring_status
+COPY src/odoo-cloud-platform/session_redis /odoo/addons/session_redis
 
 # Expose Odoo services
 EXPOSE 8069 8072
 
 RUN pip3 install -r /odoo/requirements.txt
 
-RUN chown -R odoo /etc/odoo /mnt/extra-addons /odoo
+RUN chown -R odoo /etc/odoo /odoo /data
 
 # Set the default config file
 ENV ODOO_RC /etc/odoo/odoo.conf

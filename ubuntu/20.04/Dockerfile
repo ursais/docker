@@ -13,6 +13,7 @@ RUN apt-get update \
     curl \
     htop \
     iotop \
+    rsync \
     tar \
     vim \
   && apt-get clean all \
