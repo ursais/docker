@@ -89,13 +89,13 @@ function create() {
   EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$EXIST" != "1" ]; then
     echo "Creating $1"
-    createdb $1
+    createdb --maintenance-db=$DEFAULTDB $1
   fi
 }
 
 function drop() {
   echo "Dropping $1"
-  dropdb --if-exists $1
+  dropdb --if-exists --maintenance-db=$DEFAULTDB $1
   if [[ -z "$AWS_HOST" ]]; then
     rm -Rf $ODOO_DATA_DIR/filestore/$1
   else
