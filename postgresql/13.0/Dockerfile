@@ -11,3 +11,5 @@ RUN apt-get update \
         pg-activity \
         vim \
     && rm -rf /var/lib/apt/lists/*
+
+USER postgres
