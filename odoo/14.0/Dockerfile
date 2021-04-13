@@ -66,10 +66,10 @@ EXPOSE 8069 8072
 
 RUN pip3 install -r /odoo/requirements.txt
 
-RUN chown -R odoo /etc/odoo /odoo
+RUN chown -R odoo /odoo
 
 # Set the default config file
-ENV ODOO_RC /etc/odoo/odoo.conf
+ENV ODOO_RC /odoo/odoo.conf
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["odoo"]
