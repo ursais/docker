@@ -63,13 +63,14 @@ COPY src/odoo-cloud-platform/session_redis /odoo/addons/session_redis
 
 # Expose Odoo services
 EXPOSE 8069 8072
+VOLUME /odoo/data
 
 RUN pip3 install -r /odoo/requirements.txt
 
-RUN chown -R odoo /etc/odoo /odoo
+RUN chown -R odoo /odoo
 
 # Set the default config file
-ENV ODOO_RC /etc/odoo/odoo.conf
+ENV ODOO_RC /odoo/odoo.conf
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["odoo"]
