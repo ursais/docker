@@ -8,8 +8,6 @@ set -e
 
 # Set default value to environment variables
 : ${RUNNING_ENV:='dev'}
-# AWS
-: ${AWS_HOST:='false'}
 # Odoo
 : ${ODOO_DATA_DIR:='/odoo/data'}
 # PostgreSQL
@@ -22,8 +20,6 @@ set -e
 # MARABUNTA
 : ${MARABUNTA_MODE:='full'}
 : ${MARABUNTA_ALLOW_SERIE:='false'}
-# Redis
-: ${ODOO_SESSION_REDIS:='false'}
 
 function config_s3cmd() {
   echo "Configure s3cmd"
