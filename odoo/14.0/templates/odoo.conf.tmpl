@@ -2,7 +2,7 @@
 addons_path = {{ default .Env.ODOO_ADDONS_PATH "/odoo/addons" }}
 admin_passwd = {{ default .Env.ODOO_ADMIN_PASSWD "admin" }}
 csv_internal_sep = {{ default .Env.ODOO_CSV_INTERNAL_SEP "," }}
-data_dir = {{ default .Env.ODOO_DATA_DIR "/odoo/data" }}
+data_dir = {{ default .Env.ODOO_DATA_DIR "/mnt/data/odoo" }}
 dbfilter = {{ default .Env.ODOO_DBFILTER "^[^BACKUP|defaultdb].*$" }}
 db_host = {{ default .Env.PGHOST "db" }}
 db_maxconn = {{ default .Env.ODOO_DB_MAXCONN "64" }}
