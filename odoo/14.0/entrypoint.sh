@@ -60,7 +60,7 @@ function migrate() {
     export PGDATABASE=$DB_NAME
     [ "$OLD" != "" ] && export MARABUNTA_FORCE_VERSION=$NEW
     echo "Migrating $DB_NAME"
-    marabunta
+    gosu odoo marabunta
     sed -i -e "s/db_name =.*/db_name = $OLD_PGDATABASE/" "$ODOO_RC"
     export PGDATABASE=$OLD_PGDATABASE
   fi
