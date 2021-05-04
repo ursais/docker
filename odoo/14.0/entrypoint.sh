@@ -25,13 +25,14 @@ function config_s3cmd() {
   echo "Configure s3cmd"
   export S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
   dockerize -template $TEMPLATES/s3cfg.tmpl:$HOME/.s3cfg
+  cp $HOME/.s3cfg ~odoo/.s3cfg
   export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
 }
 
 function config_odoo() {
   echo "Configure Odoo"
   dockerize -template $TEMPLATES/odoo.conf.tmpl:$ODOO_RC
-  chown -R odoo /odoo
+  chown -R odoo $ODOO_DATA_DIR $ODOO_RC
 }
 
 function migrate() {
@@ -142,7 +143,7 @@ if [ "$1" == "--test-enable" ] ; then
   # Run odoo with all command line arguments
   # shellcheck disable=SC2145
   echo "Running Odoo with the following commands: odoo $@"
-  exec odoo "$@"
+  exec gosu odoo odoo "$@"
   exit 0
 else
   case "$RUNNING_ENV" in
