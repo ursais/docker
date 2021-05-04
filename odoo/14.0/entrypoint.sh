@@ -31,6 +31,7 @@ function config_s3cmd() {
 function config_odoo() {
   echo "Configure Odoo"
   dockerize -template $TEMPLATES/odoo.conf.tmpl:$ODOO_RC
+  chown -R odoo /odoo
 }
 
 function migrate() {
@@ -171,16 +172,16 @@ else
       -- | odoo)
           shift
           if [[ "$1" == "scaffold" ]] ; then
-              exec odoo "$@"
+              exec gosu odoo odoo "$@"
           else
-              exec odoo "$@"
+              exec gosu odoo odoo "$@"
           fi
           ;;
       -*)
-          exec odoo "$@"
+          exec gosu odoo odoo "$@"
           ;;
       *)
-          exec "$@"
+          exec gosu odoo "$@"
   esac
 fi
 
