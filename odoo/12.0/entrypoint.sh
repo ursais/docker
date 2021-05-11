@@ -79,6 +79,11 @@ function duplicate() {
         cp -R $ODOO_DATA_DIR/filestore/BACKUP $ODOO_DATA_DIR/filestore/$DB_NAME
       else
         s3cmd sync s3://$DO_SPACE/$RUNNING_ENV-BACKUP/ s3://$DO_SPACE/$RUNNING_ENV-$DB_NAME/
+        psql -d $DB_NAME -c "
+          UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
+            SELECT id,REPLACE(store_fname, 'production-MASTER', '$RUNNING_ENV-$DB_NAME')
+              AS store_fname FROM ir_attachment WHERE db_datas is NULL)
+          AS s(id,store_fname) where t.id = s.id;"
       fi
       migrate $DB_NAME
     fi

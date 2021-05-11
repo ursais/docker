@@ -1,4 +1,5 @@
 anthem
+azure-storage-blob
 boto3
 marabunta
 numpy
