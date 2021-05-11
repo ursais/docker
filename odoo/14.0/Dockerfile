@@ -49,8 +49,8 @@ RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/od
     && rm -rf /var/lib/apt/lists/* odoo.deb
 
 # Install azcopy
-RUN wget https://aka.ms/downloadazcopy-v10-linux \
-    && tar -xvf downloadazcopy-v10-linux \
+RUN curl -L -o downloadazcopy-v10-linux.tgz https://aka.ms/downloadazcopy-v10-linux \
+    && tar -xvf downloadazcopy-v10-linux.tgz \
     && cp ./azcopy_linux_amd64_*/azcopy /usr/local/bin/
 
 RUN mkdir -p /odoo/addons /odoo/data
