@@ -48,6 +48,11 @@ RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/od
     && apt-get -y install --no-install-recommends ./odoo.deb \
     && rm -rf /var/lib/apt/lists/* odoo.deb
 
+# Install azcopy
+RUN wget https://aka.ms/downloadazcopy-v10-linux \
+    && tar -xvf downloadazcopy-v10-linux \
+    && cp ./azcopy_linux_amd64_*/azcopy /usr/local/bin/
+
 RUN mkdir -p /odoo/addons /odoo/data
 
 # Copy entrypoint script and Odoo configuration file
@@ -57,6 +62,7 @@ COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Copy Odoo addons
+# COPY src/odoo-cloud-platform/attachment_azure /odoo/addons/attachment_azure
 COPY src/odoo-cloud-platform/attachment_s3 /odoo/addons/attachment_s3
 COPY src/odoo-cloud-platform/base_attachment_object_storage /odoo/addons/base_attachment_object_storage
 COPY src/odoo-cloud-platform/monitoring_status /odoo/addons/monitoring_status
