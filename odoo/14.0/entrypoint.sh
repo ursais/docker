@@ -18,7 +18,7 @@ set -e
 : ${PGDATABASE:='False'}
 : ${DEFAULTDB:='postgres'}
 # MARABUNTA
-: ${MARABUNTA_MODE:='full'}
+: ${MARABUNTA_MODE:='base'}
 : ${MARABUNTA_ALLOW_SERIE:='false'}
 
 function config_s3cmd() {
