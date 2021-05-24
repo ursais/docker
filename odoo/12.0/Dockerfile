@@ -4,15 +4,18 @@ MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+        ca-certificates \
         dirmngr \
         fonts-noto-cjk \
         gnupg \
         libpq-dev \
+        gosu \
         libssl1.0-dev \
         nodejs-dev \
         node-gyp \
         node-less \
         npm \
+        python3-num2words \
         python3-pip \
         python3-phonenumbers \
         python3-pyldap \
@@ -24,6 +27,7 @@ RUN apt-get update \
         python3-watchdog \
         python3-wheel \
         python3-xlrd \
+        python3-xlwt \
         rsync \
         s3cmd \
         xz-utils \
@@ -48,29 +52,31 @@ RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/od
     && apt-get -y install --no-install-recommends ./odoo.deb \
     && rm -rf /var/lib/apt/lists/* odoo.deb
 
-RUN mkdir -p /odoo && mkdir -p /addons && mkdir /data
+RUN mkdir -p /odoo/addons /odoo/data
 
-# Copy files
+# Copy entrypoint script and Odoo configuration file
 COPY entrypoint.sh /
 COPY templates /odoo/templates
 COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Copy Odoo addons
-COPY src/odoo-cloud-platform/attachment_s3 /addons/attachment_s3
-COPY src/odoo-cloud-platform/base_attachment_object_storage /addons/base_attachment_object_storage
-COPY src/odoo-cloud-platform/monitoring_status /addons/monitoring_status
-COPY src/odoo-cloud-platform/session_redis /addons/session_redis
+COPY src/odoo-cloud-platform/attachment_s3 odoo/addons/attachment_s3
+COPY src/odoo-cloud-platform/base_attachment_object_storage odoo/addons/base_attachment_object_storage
+COPY src/odoo-cloud-platform/monitoring_status odoo/addons/monitoring_status
+COPY src/odoo-cloud-platform/session_redis odoo/addons/session_redis
 
 # Expose Odoo services
 EXPOSE 8069 8072
 
 RUN pip3 install -r /odoo/requirements.txt
 
-RUN chown -R odoo /odoo /etc/odoo /addons /data
+RUN chown -R odoo /odoo
 
 # Set the default config file
-ENV ODOO_RC /etc/odoo/odoo.conf
+ENV ODOO_RC /odoo/odoo.conf
+
+VOLUME /odoo/data
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["odoo"]
