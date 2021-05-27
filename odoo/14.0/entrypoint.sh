@@ -7,7 +7,13 @@
 set -e
 
 # Set default value to environment variables
+: ${PLATFORM:='do'}
 : ${RUNNING_ENV:='dev'}
+# AWS
+: ${AWS_HOST:='false'}
+# Azure
+: ${AZURE_STORAGE_CONNECTION_STRING:='false'}
+: ${AZURE_STORAGE_ACCOUNT_KEY:='false'}
 # Odoo
 : ${ODOO_DATA_DIR:='/odoo/data'}
 # PostgreSQL
@@ -15,18 +21,32 @@ set -e
 : ${PGPORT:=5432}
 : ${PGUSER:='odoo'}
 : ${PGPASSWORD:='odoo'}
-: ${PGDATABASE:='False'}
+: ${PGDATABASE:='false'}
 : ${DEFAULTDB:='postgres'}
+: ${PGSSLMODE:='prefer'}
 # MARABUNTA
 : ${MARABUNTA_MODE:='base'}
 : ${MARABUNTA_ALLOW_SERIE:='false'}
 
-function config_s3cmd() {
-  echo "Configure s3cmd"
-  export S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
-  dockerize -template $TEMPLATES/s3cfg.tmpl:$HOME/.s3cfg
-  cp $HOME/.s3cfg ~odoo/.s3cfg
-  export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
+# Configuration functions
+function config_rclone() {
+  echo "Configure Rclone"
+  mkdir -p $HOME/.config/rclone
+  dockerize -template $TEMPLATES/rclone.conf.tmpl:$HOME/.config/rclone/rclone.conf
+  case "$PLATFORM" in
+    "aws")
+      ;;
+    "azure")
+      SPACE=""
+      ;;
+    "do")
+      SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
+      ;;
+    *)
+      echo "I don't know how to get the bucket for this platform."
+      ;;
+  esac
+  export SPACE
 }
 
 function config_odoo() {
@@ -35,6 +55,7 @@ function config_odoo() {
   chown -R odoo $ODOO_DATA_DIR $ODOO_RC
 }
 
+# Main functions
 function migrate() {
   OLD=""
   export DB_NAME=$1
@@ -67,26 +88,40 @@ function migrate() {
 }
 
 function duplicate() {
-  BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP';")
+  BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'backup';")
   if [ "$BACKUP" == "1" ]; then
-    # If BACKUP database exists, copy it and upgrade it
+    # If backup database exists, copy it and upgrade it
     # TODO: Build DB_NAME with the tag of the image
     export DB_NAME=$(date -u +'%Y%m%d')
     TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
     # Create one YYYYMMDD database per day and migrate it
     if [ "$TODAY" != "1" ]; then
-      echo "Duplicating BACKUP to $DB_NAME"
-      psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE \"BACKUP\"";
-      if [[ -z "$AWS_HOST" ]]; then
-        cp -R $ODOO_DATA_DIR/filestore/BACKUP $ODOO_DATA_DIR/filestore/$DB_NAME
-      else
-        s3cmd sync s3://$DO_SPACE/$RUNNING_ENV-BACKUP/ s3://$DO_SPACE/$RUNNING_ENV-$DB_NAME/
-        psql -d $DB_NAME -c "
-          UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
-            SELECT id,REPLACE(store_fname, 'production-MASTER', '$RUNNING_ENV-$DB_NAME')
-              AS store_fname FROM ir_attachment WHERE db_datas is NULL)
-          AS s(id,store_fname) where t.id = s.id;"
-      fi
+      echo "Duplicating backup to $DB_NAME"
+      psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE \"backup\"";
+      case "$PLATFORM" in
+        "aws")
+          rclone sync remote:/$SPACE/$RUNNING_ENV-backup/ remote:/$SPACE/$RUNNING_ENV-$DB_NAME/
+          psql -d $DB_NAME -c "
+            UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
+              SELECT id,REPLACE(store_fname, 'production-master', '$RUNNING_ENV-$DB_NAME')
+                AS store_fname FROM ir_attachment WHERE db_datas is NULL)
+            AS s(id,store_fname) where t.id = s.id;"
+          ;;
+        "azure")
+          rclone sync remote:/$SPACE/$RUNNING_ENV-backup/ remote:/$SPACE/$RUNNING_ENV-$DB_NAME/
+          ;;
+        "do")
+          rclone sync remote:/$SPACE/$RUNNING_ENV-backup/ remote:/$SPACE/$RUNNING_ENV-$DB_NAME/
+          psql -d $DB_NAME -c "
+            UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
+              SELECT id,REPLACE(store_fname, 'production-master', '$RUNNING_ENV-$DB_NAME')
+                AS store_fname FROM ir_attachment WHERE db_datas is NULL)
+            AS s(id,store_fname) where t.id = s.id;"
+          ;;
+        *)
+          cp -R $ODOO_DATA_DIR/filestore/backup $ODOO_DATA_DIR/filestore/$DB_NAME
+          ;;
+      esac
       migrate $DB_NAME
     fi
   fi
@@ -103,19 +138,28 @@ function create() {
 function drop() {
   echo "Dropping $1"
   dropdb --if-exists --maintenance-db=$DEFAULTDB $1
-  if [[ -z "$AWS_HOST" ]]; then
-    rm -Rf $ODOO_DATA_DIR/filestore/$1
-  else
-    s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV-$1/
-  fi
+  case "$PLATFORM" in
+    "aws")
+      rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
+      ;;
+    "azure")
+      rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
+      ;;
+    "do")
+      rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
+      ;;
+    *)
+      rm -Rf $ODOO_DATA_DIR/filestore/$1
+      ;;
+  esac
 }
 
-function upgrade_existing () {
+function upgrade_existing() {
   echo "Upgrade existing databases"
   DATABASES=$(psql -X -A -t $DEFAULTDB -c "
     SELECT datname
     FROM pg_database
-    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'template0', 'template1')";)
+    WHERE datname not in ('master', 'backup', 'latest', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'template0', 'template1')";)
   for DB_NAME in $DATABASES; do
     echo "Upgrading $DB_NAME"
     migrate $DB_NAME
@@ -133,7 +177,7 @@ export MARABUNTA_DB_HOST=$PGHOST
 # For anthem
 export ODOO_DATA_PATH=/odoo/songs/data
 
-[[ -z "$AWS_HOST" ]] || config_s3cmd
+config_rclone
 config_odoo
 
 # shellcheck disable=SC2068
@@ -153,8 +197,8 @@ if [ "$1" == "--test-enable" ] ; then
 else
   case "$RUNNING_ENV" in
     "production")
-      create MASTER
-      migrate MASTER
+      create master
+      migrate master
       ;;
     "qa")
       upgrade_existing
@@ -165,9 +209,9 @@ else
       duplicate
       ;;
     "dev")
-      drop LATEST
-      create LATEST
-      migrate LATEST
+      drop latest
+      create latest
+      migrate latest
       ;;
     *)
       ;;
@@ -188,6 +232,7 @@ else
           ;;
       *)
           exec gosu odoo "$@"
+          ;;
   esac
 fi
 

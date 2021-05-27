@@ -13,6 +13,5 @@
     origin: git+ssh://git@github.com/ursais/odoo-cloud-platform.git
   merges:
     - up 14.0
-    - up refs/pull/218/head
     - up refs/pull/225/head
   target: &odoo_14 origin docker/14.0

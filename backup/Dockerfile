@@ -9,6 +9,7 @@ RUN apt-get update \
       gzip \
       openssh-client \
       postgresql-client \
+      rclone \
       rsync \
       s3cmd \
       tar \
