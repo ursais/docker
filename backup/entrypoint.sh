@@ -33,24 +33,24 @@ export TEMPLATES=/templates
 
 # Configuration functions
 function config_rclone() {
-  echo "Configure Rclone"
+  echo "Configure rclone"
   mkdir -p $HOME/.config/rclone
   dockerize -template $TEMPLATES/rclone.conf.tmpl:$HOME/.config/rclone/rclone.conf
   case "$PLATFORM" in
     "aws")
-      SPACE=""
+      export SPACE=""
       ;;
     "azure")
-      SPACE=""
+      export SPACE=""
       ;;
     "do")
-      SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
+      export SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
       ;;
     *)
-      echo "I don't know how to get the space for this platform."
+      echo "I don't know how to configure rclone for $PLATFORM."
+      exit 1
       ;;
   esac
-  export $SPACE
 }
 
 # Common functions
@@ -81,6 +81,7 @@ function backup() {
       ;;
     *)
       echo "Backup profile does not exist. I don't know how to backup $1."
+      exit 1
       ;;
   esac
 }
@@ -103,6 +104,7 @@ function restore() {
       ;;
     *)
       echo "Restore profile does not exist. I don't know how to restore $1."
+      exit 1
       ;;
   esac
 }
