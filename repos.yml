@@ -1,8 +1,8 @@
-./odoo/14.0/src/odoo-cloud-platform:
-  remotes:
-    up: https://github.com/camptocamp/odoo-cloud-platform.git
-    origin: git+ssh://git@github.com/ursais/odoo-cloud-platform.git
-  merges:
-    - up 14.0
-    - up refs/pull/225/head
-  target: &odoo_14 origin docker/14.0
+#./odoo/14.0/src/odoo-cloud-platform:
+#  remotes:
+#    up: https://github.com/camptocamp/odoo-cloud-platform.git
+#    origin: git+ssh://git@github.com/ursais/odoo-cloud-platform.git
+#  merges:
+#    - up 14.0
+#    - up refs/pull/225/head
+#  target: &odoo_14 origin docker/14.0
