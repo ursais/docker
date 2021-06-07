@@ -52,6 +52,7 @@ This repository contains Dockerfile files used to build solutions provided by
 
 * [Backup](https://github.com/ursais/docker/blob/master/backup/Dockerfile)
 * [MailHog](https://github.com/ursais/docker/blob/master/mailhog/Dockerfile) (Todo)
+* [PySpy]((https://github.com/ursais/docker/blob/master/pyspy/Dockerfile))
 
 # Operating Systems
 
