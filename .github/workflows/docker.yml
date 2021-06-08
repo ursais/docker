@@ -21,14 +21,13 @@ jobs:
 
       - name: Run tests
         run: |
-          PWD=$(pwd)
+          OLD_PWD=$(pwd)
           for image in `find . -name Dockerfile`; do
             echo "Building $image..."
             cd $(dirname $image)
             docker build . --file Dockerfile
             echo "Build of $image completed!"
-            cd $PWD
-            pwd
+            cd $OLD_PWD
           done
 
   os:
@@ -48,7 +47,7 @@ jobs:
 
       - name: Build and push
         run: |
-          PWD=$(pwd)
+          OLD_PWD=$(pwd)
           for image in `find $OS -name Dockerfile | sort -r`; do
             echo $image
             DIR=$(dirname $image)
@@ -58,7 +57,7 @@ jobs:
             [ "$VERSION" == "master" ] && VERSION=latest
             docker build . --file Dockerfile --tag $IMAGE_ID:$VERSION
             docker push $IMAGE_ID:$VERSION
-            cd $PWD
+            cd $OLD_PWD
           done
 
   apps:
@@ -78,7 +77,7 @@ jobs:
 
       - name: Build and push
         run: |
-          PWD=$(pwd)
+          OLD_PWD=$(pwd)
           for image in `find $APPS -name Dockerfile`; do
             echo $image
             DIR=$(dirname $image)
@@ -88,5 +87,5 @@ jobs:
             [ "$VERSION" == "master" ] && VERSION=latest
             docker build . --file Dockerfile --tag $IMAGE_ID:$VERSION
             docker push $IMAGE_ID:$VERSION
-            cd $PWD
+            cd $OLD_PWD
           done
