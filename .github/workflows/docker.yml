@@ -21,10 +21,12 @@ jobs:
 
       - name: Run tests
         run: |
+          PWD=$(pwd)
           for image in `find . -name Dockerfile`; do
-            echo $image
+            echo "Building $image..."
             cd $(dirname $image)
             docker build . --file Dockerfile
+            cd $PWD
           done
 
   os:
