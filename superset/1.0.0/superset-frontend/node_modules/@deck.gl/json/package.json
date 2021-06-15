@@ -1,0 +1,72 @@
+{
+  "_args": [
+    [
+      "@deck.gl/json@7.1.11",
+      "/app/superset-frontend"
+    ]
+  ],
+  "_from": "@deck.gl/json@7.1.11",
+  "_id": "@deck.gl/json@7.1.11",
+  "_inBundle": false,
+  "_integrity": "sha512-obYAXq5VZ0qCTVS8hopS64aXGicUeBNg0/03AAfo+Q5z62cNqagAktGKVZMUsJ13bV8CPohJ2zRWMXO+mAJtew==",
+  "_location": "/@deck.gl/json",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "@deck.gl/json@7.1.11",
+    "name": "@deck.gl/json",
+    "escapedName": "@deck.gl%2fjson",
+    "scope": "@deck.gl",
+    "rawSpec": "7.1.11",
+    "saveSpec": null,
+    "fetchSpec": "7.1.11"
+  },
+  "_requiredBy": [
+    "/deck.gl"
+  ],
+  "_resolved": "https://registry.npmjs.org/@deck.gl/json/-/json-7.1.11.tgz",
+  "_spec": "7.1.11",
+  "_where": "/app/superset-frontend",
+  "bugs": {
+    "url": "https://github.com/uber/deck.gl/issues"
+  },
+  "dependencies": {
+    "d3-dsv": "^1.0.8"
+  },
+  "description": "JSON format rendering components for deck.gl",
+  "esnext": "dist/es6/index.js",
+  "files": [
+    "dist",
+    "src",
+    "dist.min.js"
+  ],
+  "gitHead": "a19c9b9f430e2d16e5b8614d893e44096e67eba4",
+  "homepage": "https://github.com/uber/deck.gl#readme",
+  "keywords": [
+    "webgl",
+    "visualization",
+    "overlay",
+    "layer"
+  ],
+  "license": "MIT",
+  "main": "dist/es5/index.js",
+  "module": "dist/esm/index.js",
+  "name": "@deck.gl/json",
+  "peerDependencies": {
+    "@deck.gl/core": "^7.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uber/deck.gl.git"
+  },
+  "scripts": {
+    "build-bundle": "webpack --config ../../scripts/bundle.config.js",
+    "prepublishOnly": "npm run build-bundle && npm run build-bundle -- --env.dev"
+  },
+  "sideEffects": false,
+  "version": "7.1.11"
+}

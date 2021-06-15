@@ -1,0 +1,3 @@
+/// <reference types="webpack-env" />
+/// <reference types="node" />
+export declare const resolveFile: NodeJS.RequireResolve;

@@ -1,0 +1,2 @@
+import { PreviewProps } from './utils/types';
+export declare const previewProps: PreviewProps;

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/materials/pbr-material.js"],"names":["Material","PBRMaterial"],"mappings":"AAAA,OAAOA,QAAP,MAAqB,YAArB;AAEA,eAAe,MAAMC,WAAN,SAA0BD,QAA1B,CAAmC","sourcesContent":["import Material from './material';\n\nexport default class PBRMaterial extends Material {}\n"],"file":"pbr-material.js"}

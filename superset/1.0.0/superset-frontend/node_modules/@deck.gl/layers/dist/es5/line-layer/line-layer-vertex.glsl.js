@@ -1,0 +1,9 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = "#define SHADER_NAME line-layer-vertex-shader\n\nattribute vec3 positions;\nattribute vec3 instanceSourcePositions;\nattribute vec3 instanceTargetPositions;\nattribute vec4 instanceSourceTargetPositions64xyLow;\nattribute vec4 instanceColors;\nattribute vec3 instancePickingColors;\nattribute float instanceWidths;\n\nuniform float opacity;\nuniform float widthScale;\nuniform float widthMinPixels;\nuniform float widthMaxPixels;\n\nvarying vec4 vColor;\nvec2 getExtrusionOffset(vec2 line_clipspace, float offset_direction, float width) {\n  vec2 dir_screenspace = normalize(line_clipspace * project_uViewportSize);\n  dir_screenspace = vec2(-dir_screenspace.y, dir_screenspace.x);\n\n  vec2 offset_screenspace = dir_screenspace * offset_direction * width / 2.0;\n  vec2 offset_clipspace = project_pixel_size_to_clipspace(offset_screenspace);\n\n  return offset_clipspace;\n}\n\nvoid main(void) {\n  vec4 source = project_position_to_clipspace(instanceSourcePositions, instanceSourceTargetPositions64xyLow.xy, vec3(0.));\n  vec4 target = project_position_to_clipspace(instanceTargetPositions, instanceSourceTargetPositions64xyLow.zw, vec3(0.));\n  float widthPixels = clamp(\n    project_size_to_pixel(instanceWidths * widthScale),\n    widthMinPixels, widthMaxPixels\n  );\n  float segmentIndex = positions.x;\n  vec4 p = mix(source, target, segmentIndex);\n  vec2 offset = getExtrusionOffset(target.xy - source.xy, positions.y, widthPixels);\n  gl_Position = p + vec4(offset, 0.0, 0.0);\n  vColor = vec4(instanceColors.rgb, instanceColors.a * opacity) / 255.;\n  picking_setPickingColor(instancePickingColors);\n}\n";
+exports.default = _default;
+//# sourceMappingURL=line-layer-vertex.glsl.js.map

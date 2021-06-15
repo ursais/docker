@@ -1,0 +1,70 @@
+{
+  "_args": [
+    [
+      "@deck.gl/react@7.1.11",
+      "/app/superset-frontend"
+    ]
+  ],
+  "_from": "@deck.gl/react@7.1.11",
+  "_id": "@deck.gl/react@7.1.11",
+  "_inBundle": false,
+  "_integrity": "sha512-WUzxhvM3jZIZkBAQgdQR+tFBAVDm5opLCKMWI9YkJUsdJzdv9uwiWCsk3Se1pCTFIa5Asb8U6YAi1CHl+OOFyA==",
+  "_location": "/@deck.gl/react",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "@deck.gl/react@7.1.11",
+    "name": "@deck.gl/react",
+    "escapedName": "@deck.gl%2freact",
+    "scope": "@deck.gl",
+    "rawSpec": "7.1.11",
+    "saveSpec": null,
+    "fetchSpec": "7.1.11"
+  },
+  "_requiredBy": [
+    "/deck.gl"
+  ],
+  "_resolved": "https://registry.npmjs.org/@deck.gl/react/-/react-7.1.11.tgz",
+  "_spec": "7.1.11",
+  "_where": "/app/superset-frontend",
+  "bugs": {
+    "url": "https://github.com/uber/deck.gl/issues"
+  },
+  "dependencies": {
+    "prop-types": "^15.6.0"
+  },
+  "description": "React Components for deck.gl",
+  "esnext": "dist/es6/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "gitHead": "a19c9b9f430e2d16e5b8614d893e44096e67eba4",
+  "homepage": "https://github.com/uber/deck.gl#readme",
+  "keywords": [
+    "webgl",
+    "visualization",
+    "overlay",
+    "layer"
+  ],
+  "license": "MIT",
+  "main": "dist/es5/index.js",
+  "module": "dist/esm/index.js",
+  "name": "@deck.gl/react",
+  "peerDependencies": {
+    "@deck.gl/core": "^7.0.0",
+    "react": "0.14.x - 16.x",
+    "react-dom": "0.14.x - 16.x"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uber/deck.gl.git"
+  },
+  "scripts": {},
+  "sideEffects": false,
+  "version": "7.1.11"
+}

@@ -1,0 +1,3 @@
+export declare function createDefaultWebpackConfig(storybookBaseConfig: any, options: {
+    presetsList: any[];
+}): Promise<any>;

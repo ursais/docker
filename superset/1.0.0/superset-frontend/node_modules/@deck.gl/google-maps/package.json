@@ -1,0 +1,69 @@
+{
+  "_args": [
+    [
+      "@deck.gl/google-maps@7.1.11",
+      "/app/superset-frontend"
+    ]
+  ],
+  "_from": "@deck.gl/google-maps@7.1.11",
+  "_id": "@deck.gl/google-maps@7.1.11",
+  "_inBundle": false,
+  "_integrity": "sha512-gYp3NFIsyT5p65HgKjXFWTDzFf7K8+6ce9d9MIqaNgVWFZdsjUy9JL5TttDMQXshaQ1aZpxtLL6ZO3BiI1w8fw==",
+  "_location": "/@deck.gl/google-maps",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "@deck.gl/google-maps@7.1.11",
+    "name": "@deck.gl/google-maps",
+    "escapedName": "@deck.gl%2fgoogle-maps",
+    "scope": "@deck.gl",
+    "rawSpec": "7.1.11",
+    "saveSpec": null,
+    "fetchSpec": "7.1.11"
+  },
+  "_requiredBy": [
+    "/deck.gl"
+  ],
+  "_resolved": "https://registry.npmjs.org/@deck.gl/google-maps/-/google-maps-7.1.11.tgz",
+  "_spec": "7.1.11",
+  "_where": "/app/superset-frontend",
+  "bugs": {
+    "url": "https://github.com/uber/deck.gl/issues"
+  },
+  "description": "Use deck.gl as a custom Google Maps overlay",
+  "esnext": "dist/es6/index.js",
+  "files": [
+    "dist",
+    "src",
+    "dist.min.js"
+  ],
+  "gitHead": "a19c9b9f430e2d16e5b8614d893e44096e67eba4",
+  "homepage": "https://github.com/uber/deck.gl#readme",
+  "keywords": [
+    "webgl",
+    "visualization",
+    "overlay",
+    "google maps"
+  ],
+  "license": "MIT",
+  "main": "dist/es5/index.js",
+  "module": "dist/esm/index.js",
+  "name": "@deck.gl/google-maps",
+  "peerDependencies": {
+    "@deck.gl/core": "^7.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uber/deck.gl.git"
+  },
+  "scripts": {
+    "build-bundle": "webpack --config ../../scripts/bundle.config.js",
+    "prepublishOnly": "npm run build-bundle && npm run build-bundle -- --env.dev"
+  },
+  "sideEffects": false,
+  "version": "7.1.11"
+}

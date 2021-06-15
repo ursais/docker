@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/materials/pbr-material.js"],"names":["PBRMaterial","Material"],"mappings":";;;;;;;;;;;;;;;;;AAAA;;IAEqBA,W;;;;;;;;;EAAoBC,oB","sourcesContent":["import Material from './material';\n\nexport default class PBRMaterial extends Material {}\n"],"file":"pbr-material.js"}

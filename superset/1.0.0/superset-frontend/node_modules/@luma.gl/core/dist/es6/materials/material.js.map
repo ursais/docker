@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/materials/material.js"],"names":["Material"],"mappings":"AAAA,eAAe,MAAMA,QAAN,CAAe","sourcesContent":["export default class Material {}\n"],"file":"material.js"}

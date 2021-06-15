@@ -1,0 +1,73 @@
+{
+  "_args": [
+    [
+      "@deck.gl/mesh-layers@7.1.11",
+      "/app/superset-frontend"
+    ]
+  ],
+  "_from": "@deck.gl/mesh-layers@7.1.11",
+  "_id": "@deck.gl/mesh-layers@7.1.11",
+  "_inBundle": false,
+  "_integrity": "sha512-rI8ffUNh7ac2GpMcGLEiKyRarOPeLfVRlMRKjl9LXU61Wgx6DaHqsMmeqxzjoXEzgiRlY/XgCjepVg0dY6btlQ==",
+  "_location": "/@deck.gl/mesh-layers",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "@deck.gl/mesh-layers@7.1.11",
+    "name": "@deck.gl/mesh-layers",
+    "escapedName": "@deck.gl%2fmesh-layers",
+    "scope": "@deck.gl",
+    "rawSpec": "7.1.11",
+    "saveSpec": null,
+    "fetchSpec": "7.1.11"
+  },
+  "_requiredBy": [
+    "/deck.gl"
+  ],
+  "_resolved": "https://registry.npmjs.org/@deck.gl/mesh-layers/-/mesh-layers-7.1.11.tgz",
+  "_spec": "7.1.11",
+  "_where": "/app/superset-frontend",
+  "bugs": {
+    "url": "https://github.com/uber/deck.gl/issues"
+  },
+  "dependencies": {
+    "@loaders.gl/core": "^1.0.3",
+    "@loaders.gl/images": "^1.0.3"
+  },
+  "description": "deck.gl layers that loads 3D meshes or scene graphs",
+  "esnext": "dist/es6/index.js",
+  "files": [
+    "dist",
+    "src",
+    "dist.min.js"
+  ],
+  "gitHead": "a19c9b9f430e2d16e5b8614d893e44096e67eba4",
+  "homepage": "https://github.com/uber/deck.gl#readme",
+  "keywords": [
+    "webgl",
+    "visualization",
+    "glTF",
+    "layer"
+  ],
+  "license": "MIT",
+  "main": "dist/es5/index.js",
+  "module": "dist/esm/index.js",
+  "name": "@deck.gl/mesh-layers",
+  "peerDependencies": {
+    "@deck.gl/core": "^7.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uber/deck.gl.git"
+  },
+  "scripts": {
+    "build-bundle": "webpack --config ../../scripts/bundle.config.js",
+    "prepublishOnly": "npm run build-bundle && npm run build-bundle -- --env.dev"
+  },
+  "sideEffects": false,
+  "version": "7.1.11"
+}

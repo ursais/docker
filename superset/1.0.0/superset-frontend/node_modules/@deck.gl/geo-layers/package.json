@@ -1,0 +1,75 @@
+{
+  "_args": [
+    [
+      "@deck.gl/geo-layers@7.1.11",
+      "/app/superset-frontend"
+    ]
+  ],
+  "_from": "@deck.gl/geo-layers@7.1.11",
+  "_id": "@deck.gl/geo-layers@7.1.11",
+  "_inBundle": false,
+  "_integrity": "sha512-gIJ1K98IFSZ12hB+zHyQC+9pMncb9BKVhJTA7pjUpxwcmEkkroqet9zkYQQMeSInK0a67BR9GXjebb/N0U04qA==",
+  "_location": "/@deck.gl/geo-layers",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "@deck.gl/geo-layers@7.1.11",
+    "name": "@deck.gl/geo-layers",
+    "escapedName": "@deck.gl%2fgeo-layers",
+    "scope": "@deck.gl",
+    "rawSpec": "7.1.11",
+    "saveSpec": null,
+    "fetchSpec": "7.1.11"
+  },
+  "_requiredBy": [
+    "/deck.gl"
+  ],
+  "_resolved": "https://registry.npmjs.org/@deck.gl/geo-layers/-/geo-layers-7.1.11.tgz",
+  "_spec": "7.1.11",
+  "_where": "/app/superset-frontend",
+  "bugs": {
+    "url": "https://github.com/uber/deck.gl/issues"
+  },
+  "dependencies": {
+    "h3-js": "^3.4.3",
+    "long": "^3.2.0",
+    "s2-geometry": "^1.2.10"
+  },
+  "description": "deck.gl layers supporting geospatial use cases and GIS formats",
+  "esnext": "dist/es6/index.js",
+  "files": [
+    "dist",
+    "src",
+    "dist.min.js"
+  ],
+  "gitHead": "a19c9b9f430e2d16e5b8614d893e44096e67eba4",
+  "homepage": "https://github.com/uber/deck.gl#readme",
+  "keywords": [
+    "webgl",
+    "visualization",
+    "geospatial",
+    "layer"
+  ],
+  "license": "MIT",
+  "main": "dist/es5/index.js",
+  "module": "dist/esm/index.js",
+  "name": "@deck.gl/geo-layers",
+  "peerDependencies": {
+    "@deck.gl/core": "^7.0.0",
+    "@deck.gl/layers": "^7.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uber/deck.gl.git"
+  },
+  "scripts": {
+    "build-bundle": "webpack --config ../../scripts/bundle.config.js",
+    "prepublishOnly": "npm run build-bundle && npm run build-bundle -- --env.dev"
+  },
+  "sideEffects": false,
+  "version": "7.1.11"
+}

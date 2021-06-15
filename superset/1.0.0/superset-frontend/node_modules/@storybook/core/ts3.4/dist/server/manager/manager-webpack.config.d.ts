@@ -1,0 +1,4 @@
+import { Configuration } from 'webpack';
+import { ManagerWebpackOptions } from '../types';
+declare const _default: ({ configDir, configType, docsMode, entries, refs, outputDir, cache, previewUrl, versionCheck, releaseNotesData, presets, }: ManagerWebpackOptions) => Promise<Configuration>;
+export default _default;

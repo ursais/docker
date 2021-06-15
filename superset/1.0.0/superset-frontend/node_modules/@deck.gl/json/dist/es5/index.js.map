@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/index.js"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;AAIA;;AACA","sourcesContent":["//\n// @deck.gl/json: top-level exports\n//\n\nexport {default as _JSONConverter} from './json-converter/json-converter';\nexport {default as _JSONLayer} from './json-layer/json-layer';\n"],"file":"index.js"}

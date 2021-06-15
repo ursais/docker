@@ -1,0 +1,6 @@
+/// <reference types="react" />
+import { TooltipProps } from 'antd/lib/tooltip';
+export { TooltipProps } from 'antd/lib/tooltip';
+export declare const Tooltip: ({ overlayStyle, color, ...props }: TooltipProps) => JSX.Element;
+export default Tooltip;
+//# sourceMappingURL=Tooltip.d.ts.map

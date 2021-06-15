@@ -1,0 +1,84 @@
+{
+  "app": "superset",
+  "entrypoints": {
+    "preamble": {
+      "css": [],
+      "js": [
+        "/static/assets/vendors.4f0a1533.chunk.js",
+        "/static/assets/preamble.4f0a1533.entry.js"
+      ]
+    },
+    "theme": {
+      "css": [],
+      "js": [
+        "/static/assets/theme.4f0a1533.entry.js"
+      ]
+    },
+    "menu": {
+      "css": [],
+      "js": [
+        "/static/assets/vendors.4f0a1533.chunk.js",
+        "/static/assets/4.4f0a1533.chunk.js",
+        "/static/assets/menu.4f0a1533.entry.js"
+      ]
+    },
+    "spa": {
+      "css": [],
+      "js": [
+        "/static/assets/vendors.4f0a1533.chunk.js",
+        "/static/assets/mathjs.4f0a1533.chunk.js",
+        "/static/assets/thumbnail.4f0a1533.chunk.js",
+        "/static/assets/4.4f0a1533.chunk.js",
+        "/static/assets/5.4f0a1533.chunk.js",
+        "/static/assets/6.4f0a1533.chunk.js",
+        "/static/assets/spa.4f0a1533.entry.js"
+      ]
+    },
+    "addSlice": {
+      "css": [],
+      "js": [
+        "/static/assets/vendors.4f0a1533.chunk.js",
+        "/static/assets/mathjs.4f0a1533.chunk.js",
+        "/static/assets/thumbnail.4f0a1533.chunk.js",
+        "/static/assets/4.4f0a1533.chunk.js",
+        "/static/assets/5.4f0a1533.chunk.js",
+        "/static/assets/addSlice.4f0a1533.entry.js"
+      ]
+    },
+    "explore": {
+      "css": [],
+      "js": [
+        "/static/assets/vendors.4f0a1533.chunk.js",
+        "/static/assets/mathjs.4f0a1533.chunk.js",
+        "/static/assets/thumbnail.4f0a1533.chunk.js",
+        "/static/assets/4.4f0a1533.chunk.js",
+        "/static/assets/5.4f0a1533.chunk.js",
+        "/static/assets/6.4f0a1533.chunk.js",
+        "/static/assets/explore.4f0a1533.entry.js"
+      ]
+    },
+    "sqllab": {
+      "css": [],
+      "js": [
+        "/static/assets/vendors.4f0a1533.chunk.js",
+        "/static/assets/4.4f0a1533.chunk.js",
+        "/static/assets/sqllab.4f0a1533.entry.js"
+      ]
+    },
+    "profile": {
+      "css": [],
+      "js": [
+        "/static/assets/vendors.4f0a1533.chunk.js",
+        "/static/assets/4.4f0a1533.chunk.js",
+        "/static/assets/profile.4f0a1533.entry.js"
+      ]
+    },
+    "showSavedQuery": {
+      "css": [],
+      "js": [
+        "/static/assets/vendors.4f0a1533.chunk.js",
+        "/static/assets/showSavedQuery.4f0a1533.entry.js"
+      ]
+    }
+  }
+}

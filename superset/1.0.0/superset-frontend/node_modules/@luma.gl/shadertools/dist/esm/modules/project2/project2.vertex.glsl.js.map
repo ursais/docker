@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../src/modules/project2/project2.vertex.glsl.js"],"names":[],"mappings":"AAAA","sourcesContent":["export default `\\\nuniform mat4 u_MVPMatrix;\nuniform mat4 u_ModelMatrix;\nuniform mat4 u_NormalMatrix;\n`;\n"],"file":"project2.vertex.glsl.js"}

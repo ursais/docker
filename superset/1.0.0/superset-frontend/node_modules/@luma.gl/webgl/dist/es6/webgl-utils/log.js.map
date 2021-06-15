@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/webgl-utils/log.js"],"names":["Log","id","enable"],"mappings":"AAAA,SAAQA,GAAR,QAAkB,UAAlB;AAEA,eAAe,IAAIA,GAAJ,CAAQ;AAACC,EAAAA,EAAE,EAAE;AAAL,CAAR,EAAsBC,MAAtB,EAAf","sourcesContent":["import {Log} from 'probe.gl';\n\nexport default new Log({id: 'luma'}).enable();\n"],"file":"log.js"}

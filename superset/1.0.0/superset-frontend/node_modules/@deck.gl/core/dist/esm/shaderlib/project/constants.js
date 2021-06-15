@@ -1,0 +1,8 @@
+export var PROJECT_COORDINATE_SYSTEM = {
+  LNG_LAT: 1.0,
+  LNGLAT_AUTO_OFFSET: 4.0,
+  METER_OFFSETS: 2.0,
+  LNGLAT_OFFSETS: 3.0,
+  IDENTITY: 0.0
+};
+//# sourceMappingURL=constants.js.map

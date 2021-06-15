@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../src/modules/project2/project2.js"],"names":["vs","name","fs"],"mappings":"AAAA,OAAOA,EAAP,MAAe,wBAAf;AAEA,eAAe;AACbC,EAAAA,IAAI,EAAE,UADO;AAEbD,EAAAA,EAFa;AAGbE,EAAAA,EAAE,EAAEF;AAHS,CAAf","sourcesContent":["import vs from './project2.vertex.glsl';\n\nexport default {\n  name: 'project2',\n  vs,\n  fs: vs\n};\n"],"file":"project2.js"}
