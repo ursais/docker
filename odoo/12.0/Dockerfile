@@ -15,7 +15,6 @@ RUN apt-get update \
         node-gyp \
         node-less \
         npm \
-        python3-num2words \
         python3-pip \
         python3-phonenumbers \
         python3-pyldap \
@@ -27,7 +26,6 @@ RUN apt-get update \
         python3-watchdog \
         python3-wheel \
         python3-xlrd \
-        python3-xlwt \
         rsync \
         s3cmd \
         xz-utils \
