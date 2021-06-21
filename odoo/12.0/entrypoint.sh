@@ -9,7 +9,7 @@ set -e
 # Set default value to environment variables
 : ${RUNNING_ENV:='dev'}
 # Odoo
-: ${ODOO_DATA_DIR:='/data'}
+: ${ODOO_DATA_DIR:='/odoo/data'}
 # PostgreSQL
 : ${PGHOST:='db'}
 : ${PGPORT:=5432}
@@ -25,12 +25,14 @@ function config_s3cmd() {
   echo "Configure s3cmd"
   export S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
   dockerize -template $TEMPLATES/s3cfg.tmpl:$HOME/.s3cfg
+  cp $HOME/.s3cfg ~odoo/.s3cfg
   export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
 }
 
 function config_odoo() {
   echo "Configure Odoo"
   dockerize -template $TEMPLATES/odoo.conf.tmpl:$ODOO_RC
+  chown -R odoo $ODOO_DATA_DIR $ODOO_RC
 }
 
 function migrate() {
@@ -58,7 +60,7 @@ function migrate() {
     export PGDATABASE=$DB_NAME
     [ "$OLD" != "" ] && export MARABUNTA_FORCE_VERSION=$NEW
     echo "Migrating $DB_NAME"
-    marabunta
+    gosu odoo marabunta
     sed -i -e "s/db_name =.*/db_name = $OLD_PGDATABASE/" "$ODOO_RC"
     export PGDATABASE=$OLD_PGDATABASE
   fi
@@ -94,13 +96,13 @@ function create() {
   EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$EXIST" != "1" ]; then
     echo "Creating $1"
-    createdb $1
+    createdb --maintenance-db=$DEFAULTDB $1
   fi
 }
 
 function drop() {
   echo "Dropping $1"
-  dropdb --if-exists $1
+  dropdb --if-exists --maintenance-db=$DEFAULTDB $1
   if [[ -z "$AWS_HOST" ]]; then
     rm -Rf $ODOO_DATA_DIR/filestore/$1
   else
@@ -113,7 +115,7 @@ function upgrade_existing () {
   DATABASES=$(psql -X -A -t $DEFAULTDB -c "
     SELECT datname
     FROM pg_database
-    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', '_dodb', 'defaultdb', 'template0', 'template1')";)
+    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'template0', 'template1')";)
   for DB_NAME in $DATABASES; do
     echo "Upgrading $DB_NAME"
     migrate $DB_NAME
@@ -129,7 +131,7 @@ export MARABUNTA_DB_PASSWORD=$PGPASSWORD
 export MARABUNTA_DB_PORT=$PGPORT
 export MARABUNTA_DB_HOST=$PGHOST
 # For anthem
-export ODOO_DATA_PATH=/odoo/data
+export ODOO_DATA_PATH=/odoo/songs/data
 
 [[ -z "$AWS_HOST" ]] || config_s3cmd
 config_odoo
@@ -146,7 +148,7 @@ if [ "$1" == "--test-enable" ] ; then
   # Run odoo with all command line arguments
   # shellcheck disable=SC2145
   echo "Running Odoo with the following commands: odoo $@"
-  exec odoo "$@"
+  exec gosu odoo odoo "$@"
   exit 0
 else
   case "$RUNNING_ENV" in
@@ -170,22 +172,22 @@ else
     *)
       ;;
   esac
-  
+
   # Start Odoo
   case "$1" in
       -- | odoo)
           shift
           if [[ "$1" == "scaffold" ]] ; then
-              exec odoo "$@"
+              exec gosu odoo odoo "$@"
           else
-              exec odoo "$@"
+              exec gosu odoo odoo "$@"
           fi
           ;;
       -*)
-          exec odoo "$@"
+          exec gosu odoo odoo "$@"
           ;;
       *)
-          exec "$@"
+          exec gosu odoo "$@"
   esac
 fi
 
