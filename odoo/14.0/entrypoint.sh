@@ -35,6 +35,7 @@ function config_rclone() {
   dockerize -template $TEMPLATES/rclone.conf.tmpl:$HOME/.config/rclone/rclone.conf
   case "$PLATFORM" in
     "aws")
+      SPACE=""
       ;;
     "azure")
       SPACE=""

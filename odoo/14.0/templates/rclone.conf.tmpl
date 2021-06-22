@@ -2,9 +2,11 @@
 [remote]
 type = s3
 provider = AWS
-env_auth = true
+env_auth = false
 access_key_id = {{ default "" .Env.AWS_ACCESS_KEY_ID }}
 secret_access_key = {{ default "" .Env.AWS_SECRET_ACCESS_KEY }}
+region = {{ default "" .Env.AWS_REGION }}
+location_constraint = {{ default "" .Env.AWS_REGION }}
 acl = private
 {{ end }}
 {{ if contains "azure" .Env.PLATFORM }}
