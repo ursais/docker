@@ -141,7 +141,7 @@ function drop() {
   dropdb --if-exists --maintenance-db=$DEFAULTDB $1
   case "$PLATFORM" in
     "aws")
-      rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
+      rclone delete remote:/$SPACE/$RUNNING_ENV-$1/
       ;;
     "azure")
       rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
