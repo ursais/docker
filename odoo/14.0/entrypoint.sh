@@ -35,6 +35,7 @@ function config_rclone() {
   dockerize -template $TEMPLATES/rclone.conf.tmpl:$HOME/.config/rclone/rclone.conf
   case "$PLATFORM" in
     "aws")
+      SPACE=""
       ;;
     "azure")
       SPACE=""
@@ -140,7 +141,7 @@ function drop() {
   dropdb --if-exists --maintenance-db=$DEFAULTDB $1
   case "$PLATFORM" in
     "aws")
-      rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
+      rclone delete remote:/$SPACE/$RUNNING_ENV-$1/
       ;;
     "azure")
       rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
