@@ -56,7 +56,7 @@ jobs:
             cd $DIR
             VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
             [ "$VERSION" == "master" ] && VERSION=latest
-            docker build . --file Dockerfile --tag $ORG/$IMAGE_ID:$VERSION
+            docker build . --file Dockerfile --tag $ORG/$IMAGE_ID:$VERSION --no-cache
             docker push $ORG/$IMAGE_ID:$VERSION
             cd $OLD_PWD
           done
@@ -71,7 +71,7 @@ jobs:
             cd $DIR
             VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
             [ "$VERSION" == "master" ] && VERSION=latest
-            docker build . --file Dockerfile --tag $ORG/$IMAGE_ID:$VERSION
+            docker build . --file Dockerfile --tag $ORG/$IMAGE_ID:$VERSION --no-cache
             docker push $ORG/$IMAGE_ID:$VERSION
             cd $OLD_PWD
           done
