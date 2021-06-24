@@ -133,6 +133,14 @@ function create() {
   if [ "$EXIST" != "1" ]; then
     echo "Creating $1"
     createdb --maintenance-db=$DEFAULTDB $1
+    case "$PLATFORM" in
+      "aws")
+        BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
+        rclone mkdir remote:/$BUCKET/
+        ;;
+      *)
+        ;;
+    esac
   fi
 }
 
@@ -141,13 +149,15 @@ function drop() {
   dropdb --if-exists --maintenance-db=$DEFAULTDB $1
   case "$PLATFORM" in
     "aws")
-      rclone delete remote:/$SPACE/$RUNNING_ENV-$1/
+      BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
+      rclone purge remote:/$BUCKET/
       ;;
     "azure")
-      rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
+      rclone purge remote:/$RUNNING_ENV-$1/
       ;;
     "do")
-      rclone purge remote:/$SPACE/$RUNNING_ENV-$1/
+      BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
+      rclone purge remote:/$SPACE/$BUCKET/
       ;;
     *)
       rm -Rf $ODOO_DATA_DIR/filestore/$1
