@@ -9,6 +9,7 @@ set -e
 # Set default value to environment variables
 : ${PLATFORM:='do'}
 : ${RUNNING_ENV:='dev'}
+: ${APP_IMAGE_VERSION:='latest'}
 # AWS
 : ${AWS_HOST:='false'}
 # Azure
@@ -92,38 +93,36 @@ function duplicate() {
   BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'backup';")
   if [ "$BACKUP" == "1" ]; then
     # If backup database exists, copy it and upgrade it
-    # TODO: Build DB_NAME with the tag of the image
-    export DB_NAME=$(date -u +'%Y%m%d')
-    TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
-    # Create one YYYYMMDD database per day and migrate it
-    if [ "$TODAY" != "1" ]; then
-      echo "Duplicating backup to $DB_NAME"
-      psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE \"backup\"";
+    EXISTS=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1';")
+    if [ "$EXISTS" != "1" ]; then
+      echo "Duplicating backup to $1"
+      psql $DEFAULTDB -c "CREATE DATABASE \"$1\" WITH TEMPLATE \"backup\"";
       case "$PLATFORM" in
         "aws")
-          rclone sync remote:/$SPACE/$RUNNING_ENV-backup/ remote:/$SPACE/$RUNNING_ENV-$DB_NAME/
+          BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
+          rclone sync remote:/$RUNNING_ENV-backup/ remote:/$BUCKET/
           psql -d $DB_NAME -c "
             UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
-              SELECT id,REPLACE(store_fname, 'production-master', '$RUNNING_ENV-$DB_NAME')
+              SELECT id,REPLACE(store_fname, '/*production-master*/', '$BUCKET')
                 AS store_fname FROM ir_attachment WHERE db_datas is NULL)
             AS s(id,store_fname) where t.id = s.id;"
           ;;
         "azure")
-          rclone sync remote:/$SPACE/$RUNNING_ENV-backup/ remote:/$SPACE/$RUNNING_ENV-$DB_NAME/
+          rclone sync remote:/$RUNNING_ENV-backup/ remote:/$RUNNING_ENV-$1/
           ;;
         "do")
-          rclone sync remote:/$SPACE/$RUNNING_ENV-backup/ remote:/$SPACE/$RUNNING_ENV-$DB_NAME/
-          psql -d $DB_NAME -c "
+          rclone sync remote:/$SPACE/$RUNNING_ENV-backup/ remote:/$SPACE/$RUNNING_ENV-$1/
+          psql -d $1 -c "
             UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
-              SELECT id,REPLACE(store_fname, 'production-master', '$RUNNING_ENV-$DB_NAME')
+              SELECT id,REPLACE(store_fname, '/production-master/', '$RUNNING_ENV-$1')
                 AS store_fname FROM ir_attachment WHERE db_datas is NULL)
             AS s(id,store_fname) where t.id = s.id;"
           ;;
         *)
-          cp -R $ODOO_DATA_DIR/filestore/backup $ODOO_DATA_DIR/filestore/$DB_NAME
+          cp -R $ODOO_DATA_DIR/filestore/backup $ODOO_DATA_DIR/filestore/$1
           ;;
       esac
-      migrate $DB_NAME
+      migrate $1
     fi
   fi
 }
@@ -213,11 +212,11 @@ else
       ;;
     "qa")
       upgrade_existing
-      duplicate
+      duplicate $APP_IMAGE_VERSION
       ;;
     "test")
       upgrade_existing
-      duplicate
+      duplicate $(date -u +'%Y%m%d')
       ;;
     "dev")
       drop latest
