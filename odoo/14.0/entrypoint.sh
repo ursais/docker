@@ -169,7 +169,7 @@ function upgrade_existing() {
   DATABASES=$(psql -X -A -t $DEFAULTDB -c "
     SELECT datname
     FROM pg_database
-    WHERE datname not in ('master', 'backup', 'latest', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'template0', 'template1')";)
+    WHERE datname not in ('master', 'backup', 'latest', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'rdsadmin', 'template0', 'template1')";)
   for DB_NAME in $DATABASES; do
     echo "Upgrading $DB_NAME"
     migrate $DB_NAME
