@@ -124,6 +124,10 @@ function duplicate() {
       esac
       migrate $1
     fi
+  else
+    # If backup database does not exist, create the database and upgrade it
+    create $1
+    migrate $1
   fi
 }
 
