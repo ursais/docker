@@ -9,6 +9,7 @@ RUN apt-get update \
         fonts-noto-cjk \
         gnupg \
         gosu \
+        gsfonts \
         libssl-dev \
         node-less \
         npm \
