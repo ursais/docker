@@ -156,7 +156,7 @@ function drop() {
       rclone purge remote:/$BUCKET/
       ;;
     "azure")
-      rclone purge remote:/$RUNNING_ENV-$1/ || echo 0
+      ! rclone purge remote:/$RUNNING_ENV-$1/
       ;;
     "do")
       BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
