@@ -153,14 +153,14 @@ function drop() {
   case "$PLATFORM" in
     "aws")
       BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
-      rclone purge remote:/$BUCKET/
+      ! rclone purge remote:/$BUCKET/
       ;;
     "azure")
       ! rclone purge remote:/$RUNNING_ENV-$1/
       ;;
     "do")
       BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
-      rclone purge remote:/$SPACE/$BUCKET/
+      ! rclone purge remote:/$SPACE/$BUCKET/
       ;;
     *)
       rm -Rf $ODOO_DATA_DIR/filestore/$1
