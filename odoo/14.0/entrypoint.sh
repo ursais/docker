@@ -100,7 +100,7 @@ function duplicate() {
       case "$PLATFORM" in
         "aws")
           BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
-          rclone sync remote:/$RUNNING_ENV-backup/ remote:/$BUCKET/
+          rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$BUCKET/
           psql -d $DB_NAME -c "
             UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
               SELECT id,REPLACE(store_fname, '/*production-master*/', '$BUCKET')
@@ -108,10 +108,10 @@ function duplicate() {
             AS s(id,store_fname) where t.id = s.id;"
           ;;
         "azure")
-          rclone sync remote:/$RUNNING_ENV-backup/ remote:/$RUNNING_ENV-$1/
+          rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$RUNNING_ENV-$1/
           ;;
         "do")
-          rclone sync remote:/$SPACE/$RUNNING_ENV-backup/ remote:/$SPACE/$RUNNING_ENV-$1/
+          rclone sync filestore:/$SPACE/$RUNNING_ENV-backup/ filestore:/$SPACE/$RUNNING_ENV-$1/
           psql -d $1 -c "
             UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
               SELECT id,REPLACE(store_fname, '/production-master/', '$RUNNING_ENV-$1')
@@ -139,7 +139,7 @@ function create() {
     case "$PLATFORM" in
       "aws")
         BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
-        rclone mkdir remote:/$BUCKET/
+        rclone mkdir filestore:/$BUCKET/
         ;;
       *)
         ;;
@@ -153,14 +153,14 @@ function drop() {
   case "$PLATFORM" in
     "aws")
       BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
-      ! rclone purge remote:/$BUCKET/
+      ! rclone purge filestore:/$BUCKET/
       ;;
     "azure")
-      ! rclone purge remote:/$RUNNING_ENV-$1/
+      ! rclone purge filestore:/$RUNNING_ENV-$1/
       ;;
     "do")
       BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
-      ! rclone purge remote:/$SPACE/$BUCKET/
+      ! rclone purge filestore:/$SPACE/$BUCKET/
       ;;
     *)
       rm -Rf $ODOO_DATA_DIR/filestore/$1
