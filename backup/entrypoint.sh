@@ -68,6 +68,7 @@ function config_rclone() {
     "aws")
       ;;
     "azure")
+      export FILESTORE_BUCKET=$RUNNING_ENV-$PGDATABASE
       ;;
     "do")
       export FILESTORE_SPACE=`echo $FILESTORE_AWS_HOST | sed -e "s/.$FILESTORE_AWS_REGION.*$//"`
@@ -82,6 +83,7 @@ function config_rclone() {
     "aws")
       ;;
     "azure")
+      export BACKUP_BUCKET=$RUNNING_ENV-$PGDATABASE
       ;;
     "do")
       export BACKUP_SPACE=`echo $BACKUP_AWS_HOST | sed -e "s/.$BACKUP_AWS_REGION.*$//"`
@@ -97,6 +99,7 @@ function config_rclone() {
       "aws")
         ;;
       "azure")
+        export REMOTE_BUCKET=$RUNNING_ENV-$PGDATABASE
         ;;
       "do")
         export REMOTE_SPACE=`echo $REMOTE_AWS_HOST | sed -e "s/.$REMOTE_AWS_REGION.*$//"`
@@ -133,14 +136,14 @@ function backup() {
       echo "Sync the filestore to backup"
       rclone sync filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/ backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
       echo "Cleanup last month copy on backup"
-      rclone purge backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
-      rclone purge backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
+      ! rclone purge backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
+      ! rclone purge backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
       if [ $REMOTE_ENABLED == 'true' ]; then
         echo "Push, sync and cleanup to/on remote"
         rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz remote:/$REMOTE_SPACE/$REMOTE_BUCKET/
         rclone sync filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/ remote:/$REMOTE_SPACE/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
-        rclone purge remote:/$REMOTE_SPACE/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
-        rclone purge remote:/$REMOTE_SPACE/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
+        ! rclone purge remote:/$REMOTE_SPACE/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
+        ! rclone purge remote:/$REMOTE_SPACE/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
       fi
       ;;
     *)
