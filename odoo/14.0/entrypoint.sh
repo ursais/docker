@@ -138,7 +138,7 @@ function create() {
     createdb --maintenance-db=$DEFAULTDB $1
     case "$PLATFORM" in
       "aws")
-        BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
+        export BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
         rclone mkdir filestore:/$BUCKET/
         ;;
       *)
@@ -152,14 +152,14 @@ function drop() {
   dropdb --if-exists --maintenance-db=$DEFAULTDB $1
   case "$PLATFORM" in
     "aws")
-      BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
+      export BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
       ! rclone purge filestore:/$BUCKET/
       ;;
     "azure")
       ! rclone purge filestore:/$RUNNING_ENV-$1/
       ;;
     "do")
-      BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
+      export BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
       ! rclone purge filestore:/$SPACE/$BUCKET/
       ;;
     *)
@@ -191,8 +191,11 @@ export MARABUNTA_DB_HOST=$PGHOST
 # For anthem
 export ODOO_DATA_PATH=/odoo/songs/data
 
+[ "$DEBUG" == "1" ] && env | sort
 config_rclone
+[ "$DEBUG" == "1" ] && env | sort
 config_odoo
+[ "$DEBUG" == "1" ] && env | sort
 
 # shellcheck disable=SC2068
 wait-for-psql.py --db_host=$PGHOST --db_port=$PGPORT --db_user=$PGUSER --db_password=$PGPASSWORD --timeout=30 --db_name=${DEFAULTDB}
