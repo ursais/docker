@@ -156,6 +156,8 @@ function backup() {
 function restore() {
   case "$1" in
     "odoo")
+      echo "Kill Connections to $PGDATABASE"
+      psql -d template1 -c "SELECT pg_terminate_backend (pid) FROM pg_stat_activity WHERE datname = '$PGDATABASE'"
       echo "Cleanup $PGDATABASE database and filestore"
       dropdb --if-exists $PGDATABASE
       echo "Create $PGDATABASE database"
