@@ -71,7 +71,6 @@ function config_rclone() {
       export FILESTORE_BUCKET=$RUNNING_ENV-$PGDATABASE
       ;;
     "do")
-      export FILESTORE_SPACE=`echo $FILESTORE_AWS_HOST | sed -e "s/.$FILESTORE_AWS_REGION.*$//"`
       ;;
     *)
       echo "I don't know how to configure rclone for $FILESTORE_PLATFORM."
@@ -86,7 +85,6 @@ function config_rclone() {
       export BACKUP_BUCKET=backup
       ;;
     "do")
-      export BACKUP_SPACE=`echo $BACKUP_AWS_HOST | sed -e "s/.$BACKUP_AWS_REGION.*$//"`
       ;;
     *)
       echo "I don't know how to configure rclone for $BACKUP_PLATFORM."
@@ -102,7 +100,6 @@ function config_rclone() {
         export REMOTE_BUCKET=$RUNNING_ENV-$PGDATABASE
         ;;
       "do")
-        export REMOTE_SPACE=`echo $REMOTE_AWS_HOST | sed -e "s/.$REMOTE_AWS_REGION.*$//"`
         ;;
       *)
         echo "I don't know how to configure rclone for $REMOTE_PLATFORM."
@@ -132,18 +129,18 @@ function backup() {
       echo "Dump the database $PGDATABASE"
       pg_dump --clean $PGDATABASE | gzip > /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz
       echo "Push it to backup"
-      rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_SPACE/$BACKUP_BUCKET/
+      rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_BUCKET/
       echo "Sync the filestore to backup"
-      rclone sync filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/ backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
+      rclone sync filestore:/$FILESTORE_BUCKET/ backup:/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
       echo "Cleanup last month copy on backup"
-      ! rclone purge backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
-      ! rclone delete backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
+      ! rclone purge backup:/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
+      ! rclone delete backup:/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
       if [ $REMOTE_ENABLED == 'true' ]; then
         echo "Push, sync and cleanup to/on remote"
-        rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz remote:/$REMOTE_SPACE/$REMOTE_BUCKET/
-        rclone sync filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/ remote:/$REMOTE_SPACE/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
-        ! rclone purge remote:/$REMOTE_SPACE/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
-        ! rclone delete remote:/$REMOTE_SPACE/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
+        rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz remote:/$REMOTE_BUCKET/
+        rclone sync filestore:/$FILESTORE_BUCKET/ remote:/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
+        ! rclone purge remote:/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
+        ! rclone delete remote:/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
       fi
       ;;
     *)
@@ -161,9 +158,9 @@ function restore() {
       echo "Create $PGDATABASE database"
       createdb $PGDATABASE
       echo "Download yesterday's backup"
-      rclone copy backup:/$BACKUP_SPACE/$BACKUP_BUCKET/production-master-$YESTERDAY.sql.gz /tmp/
+      rclone copy backup:/$BACKUP_BUCKET/production-master-$YESTERDAY.sql.gz /tmp/
       echo "Sync the filestore"
-      rclone sync backup:/$BACKUP_SPACE/$BACKUP_BUCKET/production-master-$YESTERDAY/ filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/
+      rclone sync backup:/$BACKUP_BUCKET/production-master-$YESTERDAY/ filestore:/$FILESTORE_BUCKET/
       echo "Restore database dump"
       restore_odoo_database
       ;;
@@ -175,9 +172,7 @@ function restore() {
 }
 
 [ "$DEBUG" == "1" ] && env | sort
-
 config_rclone
-
+[ "$DEBUG" == "1" ] && env | sort
 $1 $2
-
 exit 0
