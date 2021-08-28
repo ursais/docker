@@ -134,11 +134,11 @@ function backup() {
       pg_dump --clean $PGDATABASE | gzip > /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz
       echo "Push it to backup"
       rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_SPACE/$BACKUP_BUCKET/
-      echo "Overwrite latest/RPO_DATE database backup"
+      echo "Overwrite latest database backup"
       rclone copy backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$RPO_DATE.sql.gz
       echo "Sync the filestore to backup"
       rclone sync filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/ backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
-      echo "Overwrite latest/RPO_DATE filestore backup"
+      echo "Overwrite latest filestore backup"
       rclone sync backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/ backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$RPO_DATE/
       echo "Cleanup last month copy on backup"
       ! rclone purge backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
@@ -167,9 +167,9 @@ function restore() {
       dropdb --if-exists $PGDATABASE
       echo "Create $PGDATABASE database"
       createdb $PGDATABASE
-      echo "Download latest/RPO_DATE backup"
+      echo "Download $RPO_DATE backup"
       rclone copy backup:/$BACKUP_SPACE/$BACKUP_BUCKET/production-master-$RPO_DATE.sql.gz /tmp/
-      echo "Sync the latest/RPO_DATE filestore"
+      echo "Sync the $RPO_DATE filestore"
       rclone sync backup:/$BACKUP_SPACE/$BACKUP_BUCKET/production-master-$RPO_DATE/ filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/
       echo "Restore database dump"
       restore_odoo_database
