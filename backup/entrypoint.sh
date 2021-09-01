@@ -135,7 +135,7 @@ function backup() {
       echo "Push it to backup"
       rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_SPACE/$BACKUP_BUCKET/
       echo "Overwrite latest database backup"
-      rclone copy backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$RPO_DATE.sql.gz
+      rclone copyto backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$RPO_DATE.sql.gz
       echo "Sync the filestore to backup"
       rclone sync filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/ backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
       echo "Overwrite latest filestore backup"
