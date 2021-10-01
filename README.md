@@ -42,7 +42,7 @@ This repository contains Dockerfile files used to build solutions provided by
 
 ## PostgreSQL
 
-* [13.0](https://github.com/ursais/docker/blob/master/postgresql/13.0/Dockerfile)
+* [14](https://github.com/ursais/docker/blob/master/postgresql/Dockerfile)
 
 ## ProFTPD
 
