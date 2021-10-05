@@ -1,4 +1,9 @@
-anthem==0.13.0
-marabunta==0.10.4
-numpy==1.18.5
-openupgradelib==2.0.0
+anthem
+azure-storage-blob
+boto3
+marabunta
+numpy
+odoo13-addon-web-environment-ribbon
+openupgradelib
+redis
+urllib3
