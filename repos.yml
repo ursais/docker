@@ -5,5 +5,4 @@
   merges:
     - up 14.0
     - up refs/pull/245/head
-    - up refs/pull/253/head
   target: &odoo_14 origin docker/14.0
