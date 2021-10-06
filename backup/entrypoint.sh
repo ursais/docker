@@ -15,6 +15,8 @@ set -e
 : ${PGPASSWORD:='postgres'}
 : ${PGDEFAULTDB:='postgres'}
 : ${PGSSLMODE:='prefer'}
+# Recovery Point Objective
+: ${RPO_DATE:='latest'}
 # Filestore
 : ${FILESTORE_PLATFORM:='aws'}
 ## AWS / DO
@@ -52,7 +54,6 @@ export BACKUP_BUCKET=`echo $BACKUP_AWS_BUCKETNAME | sed -e "s/{db}/$PGDATABASE/g
 [ "$REMOTE_ENABLED" == "true" ] && export REMOTE_BUCKET=`echo $REMOTE_AWS_BUCKETNAME | sed -e "s/{db}/$PGDATABASE/g"`
 # Date in UTC
 export TODAY=$(date -u +%Y%m%d)
-export YESTERDAY=$(date -d "1 day ago" -u +%Y%m%d)
 export LASTMONTH=$(date -d "1 month ago" -u +%Y%m%d)
 # For dockerize
 export TEMPLATES=/templates
@@ -112,7 +113,7 @@ function config_rclone() {
 # Common functions
 function restore_odoo_database() {
  echo "Load dump in $PGDATABASE"
- zcat /tmp/production-master-$YESTERDAY.sql.gz | psql $PGDATABASE
+ zcat /tmp/production-master-$RPO_DATE.sql.gz | psql $PGDATABASE
  echo "Deactivate the cron jobs and email servers"
  psql -c "
  UPDATE ir_cron SET active = 'f';
@@ -129,9 +130,13 @@ function backup() {
       echo "Dump the database $PGDATABASE"
       pg_dump --clean $PGDATABASE | gzip > /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz
       echo "Push it to backup"
-      rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_BUCKET/
+      rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_SPACE/$BACKUP_BUCKET/
+      echo "Overwrite latest database backup"
+      rclone copyto backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$RPO_DATE.sql.gz
       echo "Sync the filestore to backup"
-      rclone sync filestore:/$FILESTORE_BUCKET/ backup:/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
+      rclone sync filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/ backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
+      echo "Overwrite latest filestore backup"
+      rclone sync backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/ backup:/$BACKUP_SPACE/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$RPO_DATE/
       echo "Cleanup last month copy on backup"
       ! rclone purge backup:/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
       ! rclone delete backup:/$BACKUP_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
@@ -153,14 +158,16 @@ function backup() {
 function restore() {
   case "$1" in
     "odoo")
+      echo "Kill Connections to $PGDATABASE"
+      psql -d template1 -c "SELECT pg_terminate_backend (pid) FROM pg_stat_activity WHERE datname = '$PGDATABASE'"
       echo "Cleanup $PGDATABASE database and filestore"
       dropdb --if-exists $PGDATABASE
       echo "Create $PGDATABASE database"
       createdb $PGDATABASE
-      echo "Download yesterday's backup"
-      rclone copy backup:/$BACKUP_BUCKET/production-master-$YESTERDAY.sql.gz /tmp/
-      echo "Sync the filestore"
-      rclone sync backup:/$BACKUP_BUCKET/production-master-$YESTERDAY/ filestore:/$FILESTORE_BUCKET/
+      echo "Download $RPO_DATE backup"
+      rclone copy backup:/$BACKUP_SPACE/$BACKUP_BUCKET/production-master-$RPO_DATE.sql.gz /tmp/
+      echo "Sync the $RPO_DATE filestore"
+      rclone sync backup:/$BACKUP_SPACE/$BACKUP_BUCKET/production-master-$RPO_DATE/ filestore:/$FILESTORE_SPACE/$FILESTORE_BUCKET/
       echo "Restore database dump"
       restore_odoo_database
       ;;
