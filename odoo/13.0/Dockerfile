@@ -12,8 +12,8 @@ RUN apt-get update \
     gsfonts \
     libssl-dev \
     node-less \
-    npm \
-    python3-num2words \
+    # npm \
+    # python3-num2words \
     python3-pip \
     python3-phonenumbers \
     python3-pyldap \
@@ -25,13 +25,20 @@ RUN apt-get update \
     python3-watchdog \
     python3-wheel \
     python3-xlrd \
-    python3-xlwt \
+    # python3-xlwt \
     rclone \
     xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.focal_amd64.deb \
     && echo 'ae4e85641f004a2097621787bf4381e962fb91e1 wkhtmltox.deb' | sha1sum -c - \
     && apt-get install -y --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* wkhtmltox.deb
+
+# install nodejs from ppa
+
+RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh \
+    && bash nodesource_setup.sh \
+    && apt-get install -y nodejs \
+    && rm -rf nodesource_setup.sh
 
 # install latest postgresql-client
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
