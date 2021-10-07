@@ -21,6 +21,6 @@ provider = DigitalOcean
 env_auth = true
 access_key_id = {{ default "" .Env.AWS_ACCESS_KEY_ID }}
 secret_access_key = {{ default "" .Env.AWS_SECRET_ACCESS_KEY }}
-endpoint = {{ default "" .Env.AWS_REGION }}.digitaloceanspaces.com
+endpoint = {{ default "" .Env.AWS_HOST }}
 acl = private
 {{ end }}

@@ -35,21 +35,6 @@ function config_rclone() {
   echo "Configure Rclone"
   mkdir -p $HOME/.config/rclone
   dockerize -template $TEMPLATES/rclone.conf.tmpl:$HOME/.config/rclone/rclone.conf
-  case "$PLATFORM" in
-    "aws")
-      SPACE=""
-      ;;
-    "azure")
-      SPACE=""
-      ;;
-    "do")
-      SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
-      ;;
-    *)
-      echo "I don't know how to get the bucket for this platform."
-      ;;
-  esac
-  export SPACE
 }
 
 function config_odoo() {
@@ -119,7 +104,7 @@ function duplicate() {
           rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$RUNNING_ENV-$1/
           ;;
         "do")
-          rclone sync filestore:/$SPACE/$RUNNING_ENV-backup/ filestore:/$SPACE/$RUNNING_ENV-$1/
+          rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$RUNNING_ENV-$1/
           psql -d $1 -c "
             UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
               SELECT id,REPLACE(store_fname, '/production-master/', '$RUNNING_ENV-$1')
@@ -168,7 +153,7 @@ function drop() {
       ;;
     "do")
       export BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
-      ! rclone purge filestore:/$SPACE/$BUCKET/
+      ! rclone purge filestore:/$BUCKET/
       ;;
     *)
       rm -Rf $ODOO_DATA_DIR/filestore/$1
