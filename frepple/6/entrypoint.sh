@@ -42,6 +42,9 @@ then
   frepplectl createdatabase --database=scenario3
 fi
 
+echo "Configure atd"
+echo www-data > /etc/at.allow
+
 echo "Start atd"
 service atd start
 
