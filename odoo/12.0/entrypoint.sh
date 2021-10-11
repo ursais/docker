@@ -7,7 +7,15 @@
 set -e
 
 # Set default value to environment variables
+: ${PLATFORM:='do'}
 : ${RUNNING_ENV:='dev'}
+: ${APP_IMAGE_VERSION:='latest'}
+: ${MIGRATE:='true'}
+# AWS
+: ${AWS_HOST:='false'}
+# Azure
+: ${AZURE_STORAGE_CONNECTION_STRING:='false'}
+: ${AZURE_STORAGE_ACCOUNT_KEY:='false'}
 # Odoo
 : ${ODOO_DATA_DIR:='/odoo/data'}
 # PostgreSQL
@@ -15,18 +23,18 @@ set -e
 : ${PGPORT:=5432}
 : ${PGUSER:='odoo'}
 : ${PGPASSWORD:='odoo'}
-: ${PGDATABASE:='False'}
+: ${PGDATABASE:='false'}
 : ${DEFAULTDB:='postgres'}
+: ${PGSSLMODE:='prefer'}
 # MARABUNTA
 : ${MARABUNTA_MODE:='base'}
 : ${MARABUNTA_ALLOW_SERIE:='false'}
 
-function config_s3cmd() {
-  echo "Configure s3cmd"
-  export S3CMD_HOST=`echo $AWS_HOST | sed -e "s/^.*.$AWS_REGION/$AWS_REGION/"`
-  dockerize -template $TEMPLATES/s3cfg.tmpl:$HOME/.s3cfg
-  cp $HOME/.s3cfg ~odoo/.s3cfg
-  export DO_SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
+# Configuration functions
+function config_rclone() {
+  echo "Configure Rclone"
+  mkdir -p $HOME/.config/rclone
+  dockerize -template $TEMPLATES/rclone.conf.tmpl:$HOME/.config/rclone/rclone.conf
 }
 
 function config_odoo() {
@@ -35,6 +43,7 @@ function config_odoo() {
   chown -R odoo $ODOO_DATA_DIR $ODOO_RC
 }
 
+# Main functions
 function migrate() {
   OLD=""
   export DB_NAME=$1
@@ -67,28 +76,51 @@ function migrate() {
 }
 
 function duplicate() {
-  BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'BACKUP';")
+  BACKUP=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = 'backup';")
   if [ "$BACKUP" == "1" ]; then
-    # If BACKUP database exists, copy it and upgrade it
-    # TODO: Build DB_NAME with the tag of the image
-    export DB_NAME=$(date -u +'%Y%m%d')
-    TODAY=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$DB_NAME';")
-    # Create one YYYYMMDD database per day and migrate it
-    if [ "$TODAY" != "1" ]; then
-      echo "Duplicating BACKUP to $DB_NAME"
-      psql $DEFAULTDB -c "CREATE DATABASE \"$DB_NAME\" WITH TEMPLATE \"BACKUP\"";
-      if [[ -z "$AWS_HOST" ]]; then
-        cp -R $ODOO_DATA_DIR/filestore/BACKUP $ODOO_DATA_DIR/filestore/$DB_NAME
-      else
-        s3cmd sync s3://$DO_SPACE/$RUNNING_ENV-BACKUP/ s3://$DO_SPACE/$RUNNING_ENV-$DB_NAME/
-        psql -d $DB_NAME -c "
-          UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
-            SELECT id,REPLACE(store_fname, 'production-MASTER', '$RUNNING_ENV-$DB_NAME')
-              AS store_fname FROM ir_attachment WHERE db_datas is NULL)
-          AS s(id,store_fname) where t.id = s.id;"
-      fi
-      migrate $DB_NAME
+    # If backup database exists, copy it and upgrade it
+    EXISTS=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1';")
+    if [ "$EXISTS" != "1" ]; then
+      echo "Duplicating backup to $1"
+      psql $DEFAULTDB -c "CREATE DATABASE \"$1\" WITH TEMPLATE \"backup\"";
+      case "$PLATFORM" in
+        "aws")
+          BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
+          BACKUP_BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/backup/g"`
+          # Internal Field Separator: Split string by dashes in to an array
+          IFS='-' read -r -a bucket_name_array <<< "$BUCKET_NAME"
+          # Put together production bucket string
+          PRODUCTION_BUCKET_NAME=`echo production-master-${bucket_name_array[2]}`
+          echo "Sync $BACKUP_BUCKET to $BUCKET"
+          rclone sync filestore:/$BACKUP_BUCKET/ filestore:/$BUCKET/
+          echo "Replace attachment paths for database $1"
+          psql -d $1 -c "
+            UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
+              SELECT id,REPLACE(store_fname, '/$PRODUCTION_BUCKET_NAME/', '/$BUCKET/')
+                AS store_fname FROM ir_attachment WHERE store_fname IS NOT NULL)
+            AS s(id,store_fname) where t.id = s.id;"
+          ;;
+        "azure")
+          rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$RUNNING_ENV-$1/
+          ;;
+        "do")
+          rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$RUNNING_ENV-$1/
+          psql -d $1 -c "
+            UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
+              SELECT id,REPLACE(store_fname, '/production-master/', '$RUNNING_ENV-$1')
+                AS store_fname FROM ir_attachment WHERE db_datas is NULL)
+            AS s(id,store_fname) where t.id = s.id;"
+          ;;
+        *)
+          cp -R $ODOO_DATA_DIR/filestore/backup $ODOO_DATA_DIR/filestore/$1
+          ;;
+      esac
+      migrate $1
     fi
+  else
+    # If backup database does not exist, create the database and upgrade it
+    create $1
+    migrate $1
   fi
 }
 
@@ -97,25 +129,44 @@ function create() {
   if [ "$EXIST" != "1" ]; then
     echo "Creating $1"
     createdb --maintenance-db=$DEFAULTDB $1
+    case "$PLATFORM" in
+      "aws")
+        export BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
+        rclone mkdir filestore:/$BUCKET/
+        ;;
+      *)
+        ;;
+    esac
   fi
 }
 
 function drop() {
   echo "Dropping $1"
   dropdb --if-exists --maintenance-db=$DEFAULTDB $1
-  if [[ -z "$AWS_HOST" ]]; then
-    rm -Rf $ODOO_DATA_DIR/filestore/$1
-  else
-    s3cmd rm --force --recursive s3://$DO_SPACE/$RUNNING_ENV-$1/
-  fi
+  case "$PLATFORM" in
+    "aws")
+      export BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
+      ! rclone purge filestore:/$BUCKET/
+      ;;
+    "azure")
+      ! rclone purge filestore:/$RUNNING_ENV-$1/
+      ;;
+    "do")
+      export BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
+      ! rclone purge filestore:/$BUCKET/
+      ;;
+    *)
+      rm -Rf $ODOO_DATA_DIR/filestore/$1
+      ;;
+  esac
 }
 
-function upgrade_existing () {
+function upgrade_existing() {
   echo "Upgrade existing databases"
   DATABASES=$(psql -X -A -t $DEFAULTDB -c "
     SELECT datname
     FROM pg_database
-    WHERE datname not in ('MASTER', 'BACKUP', 'LATEST', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'template0', 'template1')";)
+    WHERE datname not in ('master', 'backup', 'latest', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'rdsadmin', 'template0', 'template1')";)
   for DB_NAME in $DATABASES; do
     echo "Upgrading $DB_NAME"
     migrate $DB_NAME
@@ -133,8 +184,11 @@ export MARABUNTA_DB_HOST=$PGHOST
 # For anthem
 export ODOO_DATA_PATH=/odoo/songs/data
 
-[[ -z "$AWS_HOST" ]] || config_s3cmd
+[ "$DEBUG" == "1" ] && env | sort
+config_rclone
+[ "$DEBUG" == "1" ] && env | sort
 config_odoo
+[ "$DEBUG" == "1" ] && env | sort
 
 # shellcheck disable=SC2068
 wait-for-psql.py --db_host=$PGHOST --db_port=$PGPORT --db_user=$PGUSER --db_password=$PGPASSWORD --timeout=30 --db_name=${DEFAULTDB}
@@ -150,28 +204,34 @@ if [ "$1" == "--test-enable" ] ; then
   echo "Running Odoo with the following commands: odoo $@"
   exec gosu odoo odoo "$@"
   exit 0
-else
+# RUNNING_ENV must be set and MIGRATE must be true to perform migration.
+elif [ ${MIGRATE,,} == "true" ]; then
   case "$RUNNING_ENV" in
     "production")
-      create MASTER
-      migrate MASTER
+      create master
+      migrate master
       ;;
     "qa")
       upgrade_existing
-      duplicate
+      duplicate $APP_IMAGE_VERSION
       ;;
     "test")
       upgrade_existing
-      duplicate
+      duplicate $(date -u +'%Y%m%d')
       ;;
     "dev")
-      drop LATEST
-      create LATEST
-      migrate LATEST
+      drop latest
+      create latest
+      migrate latest
       ;;
     *)
+      echo Running environment is not set.
       ;;
   esac
+else
+  echo Migration has been turned off.
+fi
+
 
   # Start Odoo
   case "$1" in
@@ -188,6 +248,7 @@ else
           ;;
       *)
           exec gosu odoo "$@"
+          ;;
   esac
 fi
 

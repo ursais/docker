@@ -27,7 +27,7 @@ RUN apt-get update \
         python3-wheel \
         python3-xlrd \
         rsync \
-        s3cmd \
+        rclone \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
     && echo 'f1689a1b302ff102160f2693129f789410a1708a wkhtmltox.deb' | sha1sum -c - \
@@ -59,6 +59,7 @@ COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Copy Odoo addons
+COPY src/odoo-cloud-platform/attachment_azure /odoo/addons/attachment_azure
 COPY src/odoo-cloud-platform/attachment_s3 /odoo/addons/attachment_s3
 COPY src/odoo-cloud-platform/base_attachment_object_storage /odoo/addons/base_attachment_object_storage
 COPY src/odoo-cloud-platform/monitoring_status /odoo/addons/monitoring_status

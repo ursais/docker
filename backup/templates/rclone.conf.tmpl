@@ -21,7 +21,7 @@ provider = DigitalOcean
 env_auth = true
 access_key_id = {{ default "" .Env.FILESTORE_AWS_ACCESS_KEY_ID }}
 secret_access_key = {{ default "" .Env.FILESTORE_AWS_SECRET_ACCESS_KEY }}
-endpoint = {{ default "" .Env.FILESTORE_AWS_REGION }}.digitaloceanspaces.com
+endpoint = {{ default "" .Env.FILESTORE_AWS_HOST }}
 acl = private
 {{ end }}
 
@@ -48,7 +48,7 @@ provider = DigitalOcean
 env_auth = true
 access_key_id = {{ default "" .Env.BACKUP_AWS_ACCESS_KEY_ID }}
 secret_access_key = {{ default "" .Env.BACKUP_AWS_SECRET_ACCESS_KEY }}
-endpoint = {{ default "" .Env.BACKUP_AWS_REGION }}.digitaloceanspaces.com
+endpoint = {{ default "" .Env.BACKUP_AWS_HOST }}
 acl = private
 {{ end }}
 
@@ -76,7 +76,7 @@ provider = DigitalOcean
 env_auth = true
 access_key_id = {{ default "" .Env.REMOTE_AWS_ACCESS_KEY_ID }}
 secret_access_key = {{ default "" .Env.REMOTE_AWS_SECRET_ACCESS_KEY }}
-endpoint = {{ default "" .Env.REMOTE_AWS_REGION }}.digitaloceanspaces.com
+endpoint = {{ default "" .Env.REMOTE_AWS_HOST }}
 acl = private
 {{ end }}
 {{ end }}

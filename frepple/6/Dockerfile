@@ -13,7 +13,7 @@ RUN apt update \
         python3-psycopg2 \
         python3-setuptools \
         python3-wheel \
-    && curl -o frepple.deb -sSL https://github.com/frePPLe/frepple/releases/download/6.11.0/ubuntu18-frepple-6.11.0.deb \
+    && curl -o frepple.deb -sSL https://github.com/frePPLe/frepple/releases/download/6.16.0/ubuntu18-frepple-6.16.0.deb \
     && apt-get install -y --no-install-recommends ./frepple.deb \
     && rm -rf /var/lib/apt/lists/* frepple.deb
 
