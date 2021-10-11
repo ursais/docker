@@ -10,6 +10,7 @@ set -e
 : ${PLATFORM:='do'}
 : ${RUNNING_ENV:='dev'}
 : ${APP_IMAGE_VERSION:='latest'}
+: ${MIGRATE:='true'}
 # AWS
 : ${AWS_HOST:='false'}
 # Azure
@@ -34,21 +35,6 @@ function config_rclone() {
   echo "Configure Rclone"
   mkdir -p $HOME/.config/rclone
   dockerize -template $TEMPLATES/rclone.conf.tmpl:$HOME/.config/rclone/rclone.conf
-  case "$PLATFORM" in
-    "aws")
-      SPACE=""
-      ;;
-    "azure")
-      SPACE=""
-      ;;
-    "do")
-      SPACE=`echo $AWS_HOST | sed -e "s/.$AWS_REGION.*$//"`
-      ;;
-    *)
-      echo "I don't know how to get the bucket for this platform."
-      ;;
-  esac
-  export SPACE
 }
 
 function config_odoo() {
@@ -100,18 +86,25 @@ function duplicate() {
       case "$PLATFORM" in
         "aws")
           BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
-          rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$BUCKET/
-          psql -d $DB_NAME -c "
+          BACKUP_BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/backup/g"`
+          # Internal Field Separator: Split string by dashes in to an array
+          IFS='-' read -r -a bucket_name_array <<< "$BUCKET_NAME"
+          # Put together production bucket string
+          PRODUCTION_BUCKET_NAME=`echo production-master-${bucket_name_array[2]}`
+          echo "Sync $BACKUP_BUCKET to $BUCKET"
+          rclone sync filestore:/$BACKUP_BUCKET/ filestore:/$BUCKET/
+          echo "Replace attachment paths for database $1"
+          psql -d $1 -c "
             UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
-              SELECT id,REPLACE(store_fname, '/*production-master*/', '$BUCKET')
-                AS store_fname FROM ir_attachment WHERE db_datas is NULL)
+              SELECT id,REPLACE(store_fname, '/$PRODUCTION_BUCKET_NAME/', '/$BUCKET/')
+                AS store_fname FROM ir_attachment WHERE store_fname IS NOT NULL)
             AS s(id,store_fname) where t.id = s.id;"
           ;;
         "azure")
           rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$RUNNING_ENV-$1/
           ;;
         "do")
-          rclone sync filestore:/$SPACE/$RUNNING_ENV-backup/ filestore:/$SPACE/$RUNNING_ENV-$1/
+          rclone sync filestore:/$RUNNING_ENV-backup/ filestore:/$RUNNING_ENV-$1/
           psql -d $1 -c "
             UPDATE ir_attachment AS t SET store_fname = s.store_fname FROM (
               SELECT id,REPLACE(store_fname, '/production-master/', '$RUNNING_ENV-$1')
@@ -160,7 +153,7 @@ function drop() {
       ;;
     "do")
       export BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
-      ! rclone purge filestore:/$SPACE/$BUCKET/
+      ! rclone purge filestore:/$BUCKET/
       ;;
     *)
       rm -Rf $ODOO_DATA_DIR/filestore/$1
@@ -211,7 +204,8 @@ if [ "$1" == "--test-enable" ] ; then
   echo "Running Odoo with the following commands: odoo $@"
   exec gosu odoo odoo "$@"
   exit 0
-else
+# RUNNING_ENV must be set and MIGRATE must be true to perform migration.
+elif [ ${MIGRATE,,} == "true" ]; then
   case "$RUNNING_ENV" in
     "production")
       create master
@@ -231,8 +225,13 @@ else
       migrate latest
       ;;
     *)
+      echo Running environment is not set.
       ;;
   esac
+else
+  echo Migration has been turned off.
+fi
+
 
   # Start Odoo
   case "$1" in

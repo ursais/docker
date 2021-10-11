@@ -11,7 +11,6 @@ RUN apt-get update \
       openssh-client \
       rclone \
       rsync \
-      s3cmd \
       tar \
       wget \
       zip \
