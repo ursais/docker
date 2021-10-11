@@ -42,6 +42,9 @@ then
   frepplectl createdatabase --database=scenario3
 fi
 
+echo "Start atd"
+service atd start
+
 echo "Start Apache 2"
 exec apachectl -D FOREGROUND
 

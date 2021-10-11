@@ -2,11 +2,12 @@ FROM ursa/ubuntu-18.04:latest
 MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 # Install FrePPLe
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apt update \
+    && apt install -y --no-install-recommends \
+        at \
         gcc \
         gnupg \
-        libssl1.0.0 \
+        libssl1.1 \
         python3-dev \
         python3-pip \
         python3-psycopg2 \
@@ -16,11 +17,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ./frepple.deb \
     && rm -rf /var/lib/apt/lists/* frepple.deb
 
-# Update the PostgreSQL client to match the server (13)
+# Update the PostgreSQL client to match the server
+ENV PGVERSION=14
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
     && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt-get update \
-    && apt-get install --no-install-recommends -y postgresql-client-13 \
+    && apt update \
+    && apt install --no-install-recommends -y postgresql-client-$PGVERSION \
     && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
