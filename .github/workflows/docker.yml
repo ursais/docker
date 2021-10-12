@@ -15,11 +15,7 @@ env:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-18.04, ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -36,24 +32,20 @@ jobs:
             cd $OLD_PWD
           done
 
-      - name: Run Apps tests
-        run: |
-          OLD_PWD=$(pwd)
-          for image in `find $APPS -name Dockerfile | sort -r`; do
-            echo "Building $image..."
-            cd $(dirname $image)
-            docker build . --file Dockerfile
-            echo "Build of $image completed!"
-            cd $OLD_PWD
-          done
+#      - name: Run Apps tests
+#        run: |
+#          OLD_PWD=$(pwd)
+#          for image in `find $APPS -name Dockerfile | sort -r`; do
+#            echo "Building $image..."
+#            cd $(dirname $image)
+#            docker build . --file Dockerfile
+#            echo "Build of $image completed!"
+#            cd $OLD_PWD
+#          done
 
   build:
     needs: test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-18.04, ubuntu-latest]
+    runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
