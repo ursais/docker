@@ -14,7 +14,7 @@ env:
   DOCKER_BUILDKIT: 1
 
 jobs:
-  test:
+  Test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,24 +27,24 @@ jobs:
           for image in `find $OS -name Dockerfile | sort -r`; do
             echo "Building $image..."
             cd $(dirname $image)
-            docker build . --file Dockerfile
+            docker build . --file Dockerfile --no-cache
             echo "Build of $image completed!"
             cd $OLD_PWD
           done
 
-#      - name: Run Apps tests
-#        run: |
-#          OLD_PWD=$(pwd)
-#          for image in `find $APPS -name Dockerfile | sort -r`; do
-#            echo "Building $image..."
-#            cd $(dirname $image)
-#            docker build . --file Dockerfile
-#            echo "Build of $image completed!"
-#            cd $OLD_PWD
-#          done
+      - name: Run Apps tests
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $APPS -name Dockerfile | sort -r`; do
+            echo "Building $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile --no-cache
+            echo "Build of $image completed!"
+            cd $OLD_PWD
+          done
 
-  build:
-    needs: test
+  Build:
+    needs: Test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
@@ -76,7 +76,7 @@ jobs:
       - name: Build and push Apps
         run: |
           OLD_PWD=$(pwd)
-          for image in `find $APPS -name Dockerfile`; do
+          for image in `find $APPS -name Dockerfile | sort -r`; do
             echo $image
             DIR=$(dirname $image)
             IMAGE_ID=$(echo $DIR | sed -e 's/^\.\///g' -e 's/\//-/g')

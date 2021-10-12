@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:focal
 MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
@@ -8,9 +8,9 @@ ENV LANG C.UTF-8
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt-get update \
-  && apt-get upgrade -y \
-  && apt-get install -y --no-install-recommends \
+RUN apt update \
+  && apt upgrade -y \
+  && apt install -y --no-install-recommends \
     ca-certificates \
     curl \
     htop \
@@ -18,8 +18,8 @@ RUN apt-get update \
     rsync \
     tar \
     vim \
-  && apt-get clean all \
-  && apt-get autoremove
+  && apt clean all \
+  && apt autoremove
 
 # Install dockerize for config files
 RUN curl -sfL $(curl -s https://api.github.com/repos/powerman/dockerize/releases/latest \
