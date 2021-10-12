@@ -21,10 +21,21 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Run tests
+      - name: Run OS tests
         run: |
           OLD_PWD=$(pwd)
-          for image in `find . -name Dockerfile`; do
+          for image in `find $OS -name Dockerfile | sort -r`; do
+            echo "Building $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile
+            echo "Build of $image completed!"
+            cd $OLD_PWD
+          done
+
+      - name: Run Apps tests
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $APPS -name Dockerfile | sort -r`; do
             echo "Building $image..."
             cd $(dirname $image)
             docker build . --file Dockerfile
