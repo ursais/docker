@@ -42,10 +42,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh \
     && rm -rf nodesource_setup.sh
 
 # install latest postgresql-client
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
-    && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt-get update  \
-    && apt-get install --no-install-recommends -y postgresql-client \
+RUN apt-get install -y postgresql-client \
     && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
