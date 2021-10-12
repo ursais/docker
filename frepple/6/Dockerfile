@@ -4,7 +4,7 @@ MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 # Install FrePPLe
 RUN apt update \
     && apt install -y --no-install-recommends \
-#        at \
+        at \
         gcc \
         gnupg \
         libssl1.1 \
@@ -14,7 +14,7 @@ RUN apt update \
         python3-setuptools \
         python3-wheel \
     && curl -o frepple.deb -sSL https://github.com/frePPLe/frepple/releases/download/6.16.0/ubuntu18-frepple-6.16.0.deb \
-    && apt-get install -y --no-install-recommends ./frepple.deb \
+    && apt install -y --no-install-recommends ./frepple.deb \
     && rm -rf /var/lib/apt/lists/* frepple.deb
 
 # Update the PostgreSQL client to match the server
