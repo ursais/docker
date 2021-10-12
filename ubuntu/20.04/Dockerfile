@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:focal
 MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]

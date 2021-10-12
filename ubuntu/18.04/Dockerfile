@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:bionic
 MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
