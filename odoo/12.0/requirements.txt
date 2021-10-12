@@ -3,6 +3,7 @@ boto3==1.16.63
 marabunta==0.10.5
 num2words==0.5.6
 numpy==1.18.5
+odoo12-addon-web-environment-ribbon
 openupgradelib==2.0.0
 pip
 redis==2.10.5
