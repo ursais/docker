@@ -14,7 +14,7 @@ env:
   DOCKER_BUILDKIT: 1
 
 jobs:
-  test:
+  Test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,7 +29,6 @@ jobs:
             cd $(dirname $image)
             docker build . --file Dockerfile --no-cache
             echo "Build of $image completed!"
-            docker image prune -af
             cd $OLD_PWD
           done
 
@@ -41,12 +40,11 @@ jobs:
             cd $(dirname $image)
             docker build . --file Dockerfile --no-cache
             echo "Build of $image completed!"
-            docker image prune -af
             cd $OLD_PWD
           done
 
-  build:
-    needs: test
+  Build:
+    needs: Test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
@@ -72,7 +70,6 @@ jobs:
             [ "$VERSION" == "master" ] && VERSION=latest
             docker build . --file Dockerfile --tag $ORG/$IMAGE_ID:$VERSION --no-cache
             docker push $ORG/$IMAGE_ID:$VERSION
-            docker image prune -af
             cd $OLD_PWD
           done
 
@@ -88,6 +85,5 @@ jobs:
             [ "$VERSION" == "master" ] && VERSION=latest
             docker build . --file Dockerfile --tag $ORG/$IMAGE_ID:$VERSION --no-cache
             docker push $ORG/$IMAGE_ID:$VERSION
-            docker image prune -af
             cd $OLD_PWD
           done
