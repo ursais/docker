@@ -33,17 +33,17 @@ jobs:
             cd $OLD_PWD
           done
 
-#      - name: Run Apps tests
-#        run: |
-#          OLD_PWD=$(pwd)
-#          for image in `find $APPS -name Dockerfile | sort -r`; do
-#            echo "Building $image..."
-#            cd $(dirname $image)
-#            docker build . --file Dockerfile
-#            echo "Build of $image completed!"
-#            docker image prune -a
-#            cd $OLD_PWD
-#          done
+      - name: Run Apps tests
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $APPS -name Dockerfile | sort -r`; do
+            echo "Building $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile
+            echo "Build of $image completed!"
+            docker image prune -a
+            cd $OLD_PWD
+          done
 
   build:
     needs: test
@@ -72,6 +72,7 @@ jobs:
             [ "$VERSION" == "master" ] && VERSION=latest
             docker build . --file Dockerfile --tag $ORG/$IMAGE_ID:$VERSION --no-cache
             docker push $ORG/$IMAGE_ID:$VERSION
+            docker image prune -a
             cd $OLD_PWD
           done
 
@@ -87,5 +88,6 @@ jobs:
             [ "$VERSION" == "master" ] && VERSION=latest
             docker build . --file Dockerfile --tag $ORG/$IMAGE_ID:$VERSION --no-cache
             docker push $ORG/$IMAGE_ID:$VERSION
+            docker image prune -a
             cd $OLD_PWD
           done
