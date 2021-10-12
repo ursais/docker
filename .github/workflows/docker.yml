@@ -29,6 +29,7 @@ jobs:
             cd $(dirname $image)
             docker build . --file Dockerfile
             echo "Build of $image completed!"
+            docker image prune -a
             cd $OLD_PWD
           done
 
@@ -40,6 +41,7 @@ jobs:
 #            cd $(dirname $image)
 #            docker build . --file Dockerfile
 #            echo "Build of $image completed!"
+#            docker image prune -a
 #            cd $OLD_PWD
 #          done
 
