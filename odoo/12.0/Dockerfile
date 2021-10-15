@@ -27,12 +27,15 @@ RUN apt update \
         python3-wheel \
         python3-xlrd \
         rsync \
-        rclone \
+        unzip \
         xz-utils \
     && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
     && echo 'f1689a1b302ff102160f2693129f789410a1708a wkhtmltox.deb' | sha1sum -c - \
     && apt install -y --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* wkhtmltox.deb
+
+#Install latest rclone
+RUN curl https://rclone.org/install.sh | bash
 
 # install latest postgresql-client
 ENV PGVERSION=12
