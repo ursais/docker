@@ -18,6 +18,7 @@ RUN apt update \
     rsync \
     tar \
     vim \
+    unzip \
   && apt clean all \
   && apt autoremove
 
