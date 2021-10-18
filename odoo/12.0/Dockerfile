@@ -72,6 +72,7 @@ COPY src/odoo-cloud-platform/session_redis /odoo/addons/session_redis
 # Expose Odoo services
 EXPOSE 8069 8072
 
+RUN pip3 install --upgrade pip
 RUN pip3 install -r /odoo/requirements.txt
 
 RUN chown -R odoo /odoo
