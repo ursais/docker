@@ -9,12 +9,14 @@ RUN apt update \
       gnupg \
       gzip \
       openssh-client \
-      rclone \
       rsync \
       tar \
       wget \
       zip \
     && apt clean all
+
+# Install Rclone
+RUN curl https://rclone.org/install.sh | bash
 
 # Update the PostgreSQL client
 ENV PGVERSION=14

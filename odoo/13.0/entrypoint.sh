@@ -131,7 +131,7 @@ function create() {
     createdb --maintenance-db=$DEFAULTDB $1
     case "$PLATFORM" in
       "aws")
-        export BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
+        export BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
         rclone mkdir filestore:/$BUCKET/
         ;;
       *)
