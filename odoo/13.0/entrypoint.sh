@@ -85,10 +85,10 @@ function duplicate() {
       psql $DEFAULTDB -c "CREATE DATABASE \"$1\" WITH TEMPLATE \"backup\"";
       case "$PLATFORM" in
         "aws")
-          BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/$1/g"`
-          BACKUP_BUCKET=`echo $BUCKET_NAME | sed -e "s/{db}/backup/g"`
+          BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
+          BACKUP_BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/backup/g"`
           # Internal Field Separator: Split string by dashes in to an array
-          IFS='-' read -r -a bucket_name_array <<< "$BUCKET_NAME"
+          IFS='-' read -r -a bucket_name_array <<< "$AWS_BUCKETNAME"
           # Put together production bucket string
           PRODUCTION_BUCKET_NAME=`echo production-master-${bucket_name_array[2]}`
           echo "Sync $BACKUP_BUCKET to $BUCKET"
