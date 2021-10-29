@@ -3,7 +3,6 @@ azure-storage-blob
 boto3
 marabunta
 numpy
-# odoo15-addon-web-environment-ribbon
 openupgradelib
 redis
 urllib3
