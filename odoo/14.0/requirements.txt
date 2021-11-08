@@ -3,7 +3,7 @@ azure-storage-blob
 boto3
 marabunta
 numpy
-odoo14-addon-web-environment-ribbon
+odoo14-addon-web-environment-ribbon=14.0.1.0.1.dev5
 openupgradelib
 redis
 urllib3
