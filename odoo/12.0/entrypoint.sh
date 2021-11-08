@@ -7,7 +7,7 @@
 set -e
 
 # Set default value to environment variables
-: ${PLATFORM:='do'}
+: ${PLATFORM:='aws'}
 : ${RUNNING_ENV:='dev'}
 : ${APP_IMAGE_VERSION:='latest'}
 : ${MIGRATE:='true'}
@@ -250,6 +250,5 @@ fi
           exec gosu odoo "$@"
           ;;
   esac
-fi
 
 exit 1
