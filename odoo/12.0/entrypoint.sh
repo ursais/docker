@@ -9,7 +9,7 @@ set -e
 # Set default value to environment variables
 : ${PLATFORM:='aws'}
 : ${RUNNING_ENV:='dev'}
-: ${APP_IMAGE_VERSION:='latest'}
+: ${APP_IMAGE_VERSION:='testing'}
 : ${MIGRATE:='true'}
 # AWS
 : ${AWS_HOST:='false'}
@@ -125,6 +125,7 @@ function duplicate() {
 }
 
 function create() {
+  echo "Start create function"
   EXIST=$(psql -X -A -t $DEFAULTDB -c "SELECT 1 AS result FROM pg_database WHERE datname = '$1'";)
   if [ "$EXIST" != "1" ]; then
     echo "Creating $1"
@@ -143,10 +144,12 @@ function create() {
 function drop() {
   echo "Dropping $1"
   dropdb --if-exists --maintenance-db=$DEFAULTDB $1
+  echo "Database $1 has been dropped"
   case "$PLATFORM" in
     "aws")
       export BUCKET=`echo $AWS_BUCKETNAME | sed -e "s/{db}/$1/g"`
       ! rclone purge filestore:/$BUCKET/
+      echo "Rclone purge complete"
       ;;
     "azure")
       ! rclone purge filestore:/$RUNNING_ENV-$1/
