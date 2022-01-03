@@ -32,7 +32,6 @@ env_auth = false
 access_key_id = {{ default "" .Env.BACKUP_AWS_ACCESS_KEY_ID }}
 secret_access_key = {{ default "" .Env.BACKUP_AWS_SECRET_ACCESS_KEY }}
 region = {{ default "" .Env.BACKUP_AWS_REGION }}
-location_constraint = {{ default "" .Env.BACKUP_AWS_REGION }}
 acl = private
 {{ end }}
 {{ if contains "azure" .Env.BACKUP_PLATFORM }}
@@ -60,7 +59,6 @@ env_auth = false
 access_key_id = {{ default "" .Env.REMOTE_AWS_ACCESS_KEY_ID }}
 secret_access_key = {{ default "" .Env.REMOTE_AWS_SECRET_ACCESS_KEY }}
 region = {{ default "" .Env.REMOTE_AWS_REGION }}
-location_constraint = {{ default "" .Env.REMOTE_AWS_REGION }}
 acl = private
 {{ end }}
 {{ if contains "azure" .Env.REMOTE_PLATFORM }}
