@@ -6,7 +6,6 @@ env_auth = false
 access_key_id = {{ default "" .Env.FILESTORE_AWS_ACCESS_KEY_ID }}
 secret_access_key = {{ default "" .Env.FILESTORE_AWS_SECRET_ACCESS_KEY }}
 region = {{ default "" .Env.FILESTORE_AWS_REGION }}
-location_constraint = {{ default "" .Env.FILESTORE_AWS_REGION }}
 acl = private
 {{ end }}
 {{ if contains "azure" .Env.FILESTORE_PLATFORM }}
