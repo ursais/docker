@@ -1,4 +1,4 @@
-anthem
+https://github.com/max3903/anthem/archive/refs/heads/patch-1.zip
 azure-storage-blob
 boto3
 marabunta
