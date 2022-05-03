@@ -2,6 +2,7 @@ FROM ursa/ubuntu-20.04:latest
 MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 # Install FrePPLe
+ENV VERSION=6.21.0
 RUN apt update \
     && apt install -y --no-install-recommends \
         at \
@@ -13,13 +14,13 @@ RUN apt update \
         python3-psycopg2 \
         python3-setuptools \
         python3-wheel \
-    && curl -o frepple.deb -sSL https://github.com/frePPLe/frepple/releases/download/6.21.0/ubuntu20-frepple-6.21.0.deb \
+    && curl -o frepple.deb -sSL https://github.com/frePPLe/frepple/releases/download/$VERSION/ubuntu20-frepple-$VERSION.deb \
     && apt install -y --no-install-recommends ./frepple.deb \
     && rm -rf /var/lib/apt/lists/* frepple.deb
 
 # Update the PostgreSQL client to match the server
 ENV PGVERSION=14
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
+RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
     && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt update \
     && apt install --no-install-recommends -y postgresql-client-$PGVERSION \
