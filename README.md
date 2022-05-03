@@ -72,6 +72,7 @@ This repository contains Dockerfile files used to build solutions provided by
 
 * [18.04](https://github.com/ursais/docker/blob/master/ubuntu/18.04/Dockerfile)
 * [20.04](https://github.com/ursais/docker/blob/master/ubuntu/20.04/Dockerfile)
+* [22.04](https://github.com/ursais/docker/blob/master/ubuntu/22.04/Dockerfile)
 
 # Support
 
