@@ -4,7 +4,7 @@
     origin: git+ssh://git@github.com/ursais/odoo-cloud-platform.git
   merges:
     - up 12.0
-    - up refs/pull/236/head
+    - up refs/pull/236/head # attachment_s3
   target: &odoo_12 origin docker/12.0
 
 ./odoo/13.0/src/odoo-cloud-platform:
@@ -13,7 +13,7 @@
     origin: git+ssh://git@github.com/ursais/odoo-cloud-platform.git
   merges:
     - up 13.0
-    - up refs/pull/266/head
+    - up refs/pull/266/head # attachment_s3
   target: &odoo_13 origin docker/13.0
 
 ./odoo/14.0/src/odoo-cloud-platform:
@@ -22,15 +22,5 @@
     origin: git+ssh://git@github.com/ursais/odoo-cloud-platform.git
   merges:
     - up 14.0
-    - up refs/pull/245/head
+    - up refs/pull/245/head # attachment_s3
   target: &odoo_14 origin docker/14.0
-
-./odoo/15.0/src/odoo-cloud-platform:
-  remotes:
-    up: https://github.com/camptocamp/odoo-cloud-platform.git
-    origin: git+ssh://git@github.com/ursais/odoo-cloud-platform.git
-  merges:
-    - up 15.0
-    # - up refs/pull/245/head
-    # - up refs/pull/253/head
-  target: &odoo_15 origin docker/15.0
