@@ -23,4 +23,5 @@
   merges:
     - up 14.0
     - up refs/pull/245/head # attachment_s3
+    - up refs/pull/345/head # session_redis
   target: &odoo_14 origin docker/14.0
