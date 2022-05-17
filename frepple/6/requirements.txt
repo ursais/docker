@@ -1,36 +1,23 @@
-cheroot == 6.5.5
+cheroot == 8.4.5
 portend == 2.5
-djangorestframework == 3.11.2
+djangorestframework == 3.13.1
 djangorestframework-bulk == 0.2.1
 djangorestframework-filters == 0.10.2
-django-admin-bootstrapped
-django-bootstrap3 == 11.1.0
+django-bootstrap3 == 15.0.0
 django-filter == 2.4.0
 html5lib == 1.0.1
 jdcal == 1.4.1
 Markdown == 3.1.1
-openpyxl == 2.6.2
+openpyxl == 3.0.9
 lxml == 4.6.5
-requests == 2.23.0
-Pillow == 9.1.0
-psutil == 5.7.3
 PyJWT == 1.7.1
+requests == 2.27.0
 python-dateutil == 2.8.1
-https://github.com/frePPLe/django/tarball/frepple_6.0
-
-# Postgres database connection
-# On linux: install psycopg2 using your distribution's package manager
-# On windows: uncomment the next lines
-# psycopg2
-# psycopg2-binary
-
-# Additional packages for development environments
-# black >= 19.3b0
-# Sphinx
-# selenium
-
-# Additional packages for windows development environments
-# pywin32
-# adodbapi
-# cx_Freeze
-# cx_Logging
+pillow >= 8.4.0
+psutil == 5.7.3
+psycopg2-binary == 2.8.6
+# Python packaging is broken on ubuntu 20 for higher versions of setuptools
+setuptools <= 46.1
+setuptools-rust == 0.12.1
+pysftp == 0.2.9
+https://github.com/frePPLe/django/tarball/frepple_6.21
