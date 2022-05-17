@@ -1,0 +1,40 @@
+name: Test
+on:
+  pull_request:
+
+env:
+  APPS: "backup frepple odoo postgresql pyspy"
+  OS: "centos debian redhat ubuntu"
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: "Operating Systems"
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $OS -name Dockerfile | sort -r`; do
+            echo "Building $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile --no-cache
+            echo "Build of $image completed!"
+            ! docker system prune -a -f
+            cd $OLD_PWD
+          done
+
+      - name: "Applications"
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $APPS -name Dockerfile | sort -r`; do
+            echo "Building $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile --no-cache
+            ! docker system prune -a -f
+            echo "Build of $image completed!"
+            cd $OLD_PWD
+          done
