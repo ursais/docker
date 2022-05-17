@@ -2,7 +2,7 @@ FROM ursa/ubuntu-20.04:latest
 MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
 
 # Install FrePPLe
-ENV VERSION=6.21.0
+ENV VERSION=6.22.0
 RUN apt update \
     && apt install -y --no-install-recommends \
         at \
