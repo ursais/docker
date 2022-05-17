@@ -31,105 +31,105 @@ except Exception:
 DEBUG_JS = DEBUG
 
 ADMINS = (
-    ('{{ default .Env.FREPPLE_ADMIN_NAME "false" }}', '{{ default .Env.FREPPLE_ADMIN_EMAIL "admin@example.com" }}'),
+    ('{{ default "admin@example.com" .Env.FREPPLE_ADMIN_NAME "false" }}', '{{ default .Env.FREPPLE_ADMIN_EMAIL }}'),
 )
 
 # ================= START UPDATED BLOCK BY WINDOWS INSTALLER =================
 
-SECRET_KEY = "{{ default .Env.FREPPLE_SECRET_KEY "false" }}"
+SECRET_KEY = "{{ default "false" .Env.FREPPLE_SECRET_KEY }}"
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "{{ default .Env.PGDATABASE "false" }}",
-        "USER": "{{ default .Env.PGUSER "frepple" }}",
-        "PASSWORD": "{{ default .Env.PGPASSWORD "frepple" }}",
-        "HOST": "{{ default .Env.PGHOST "localhost" }}",
-        "PORT": "{{ default .Env.PGPORT "5432" }}",
-        "OPTIONS": {{ default .Env.FREPPLE_OPTIONS "{}" }},
-        "CONN_MAX_AGE": {{ default .Env.FREPPLE_CONN_MAX_AGE "60" }},
+        "NAME": "{{ default "false" .Env.PGDATABASE }}",
+        "USER": "{{ default "frepple" .Env.PGUSER }}",
+        "PASSWORD": "{{ default "frepple" .Env.PGPASSWORD }}",
+        "HOST": "{{ default "localhost" .Env.PGHOST }}",
+        "PORT": "{{ default "5432" .Env.PGPORT }}",
+        "OPTIONS": {{ default "{}" .Env.FREPPLE_OPTIONS }},
+        "CONN_MAX_AGE": {{ default "60" .Env.FREPPLE_CONN_MAX_AGE }},
         "TEST": {
-            "NAME": "{{ default .Env.FREPPLE_TEST_NAME "test_frepple" }}"  # Database name used when running the test suite.
+            "NAME": "{{ default "test_frepple" .Env.FREPPLE_TEST_NAME }}"  # Database name used when running the test suite.
         },
         "FILEUPLOADFOLDER": os.path.normpath(
             os.path.join(FREPPLE_LOGDIR, "data", "default")
         ),
-        "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
-        "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
-        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_DEFAULT "127.0.0.1:8002" }}"
+        "SQL_ROLE": "{{ default "report_role" .Env.FREPPLE_SQL_ROLE }}",
+        "SECRET_WEBTOKEN_KEY": "{{ default "SECRET_KEY" .Env.FREPPLE_SECRET_WEBTOKEN_KEY }}",
+        "FREPPLE_PORT": "{{ default "127.0.0.1:8002" .Env.FREPPLE_PORT_DEFAULT }}"
     },
     "scenario1": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "scenario1",
-        "USER": "{{ default .Env.PGUSER "frepple" }}",
-        "PASSWORD": "{{ default .Env.PGPASSWORD "frepple" }}",
-        "HOST": "{{ default .Env.PGHOST "localhost" }}",
-        "PORT": "{{ default .Env.PGPORT "5432" }}",
-        "OPTIONS": {{ default .Env.FREPPLE_OPTIONS "{}" }},
-        "CONN_MAX_AGE": {{ default .Env.FREPPLE_CONN_MAX_AGE "60" }},
+        "USER": "{{ default "frepple" .Env.PGUSER }}",
+        "PASSWORD": "{{ default "frepple" .Env.PGPASSWORD }}",
+        "HOST": "{{ default "localhost" .Env.PGHOST }}",
+        "PORT": "{{ default "5432" .Env.PGPORT }}",
+        "OPTIONS": {{ default "{}" .Env.FREPPLE_OPTIONS }},
+        "CONN_MAX_AGE": {{ default "60" .Env.FREPPLE_CONN_MAX_AGE }},
         "TEST": {
             "NAME": "test_scenario1"  # Database name used when running the test suite.
         },
         "FILEUPLOADFOLDER": os.path.normpath(
             os.path.join(FREPPLE_LOGDIR, "data", "scenario1")
         ),
-        "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
-        "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
-        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO1 "127.0.0.1:8003" }}"
+        "SQL_ROLE": "{{ default "report_role" .Env.FREPPLE_SQL_ROLE }}",
+        "SECRET_WEBTOKEN_KEY": "{{ default "SECRET_KEY" .Env.FREPPLE_SECRET_WEBTOKEN_KEY }}",
+        "FREPPLE_PORT": "{{ default "127.0.0.1:8003" .Env.FREPPLE_PORT_SCENARIO1 }}"
     },
     "scenario2": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "scenario2",
-        "USER": "{{ default .Env.PGUSER "frepple" }}",
-        "PASSWORD": "{{ default .Env.PGPASSWORD "frepple" }}",
-        "HOST": "{{ default .Env.PGHOST "localhost" }}",
-        "PORT": "{{ default .Env.PGPORT "5432" }}",
-        "OPTIONS": {{ default .Env.FREPPLE_OPTIONS "{}" }},
-        "CONN_MAX_AGE": {{ default .Env.FREPPLE_CONN_MAX_AGE "60" }},
+        "USER": "{{ default "frepple" .Env.PGUSER }}",
+        "PASSWORD": "{{ default "frepple" .Env.PGPASSWORD }}",
+        "HOST": "{{ default "localhost" .Env.PGHOST }}",
+        "PORT": "{{ default "5432" .Env.PGPORT }}",
+        "OPTIONS": {{ default "{}" .Env.FREPPLE_OPTIONS }},
+        "CONN_MAX_AGE": {{ default "60" .Env.FREPPLE_CONN_MAX_AGE }},
         "TEST": {
             "NAME": "test_scenario2"  # Database name used when running the test suite.
         },
         "FILEUPLOADFOLDER": os.path.normpath(
             os.path.join(FREPPLE_LOGDIR, "data", "scenario2")
         ),
-        "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
-        "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
-        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO2 "127.0.0.1:8004" }}"
+        "SQL_ROLE": "{{ default "report_role" .Env.FREPPLE_SQL_ROLE }}",
+        "SECRET_WEBTOKEN_KEY": "{{ default "SECRET_KEY" .Env.FREPPLE_SECRET_WEBTOKEN_KEY }}",
+        "FREPPLE_PORT": "{{ default "127.0.0.1:8004" .Env.FREPPLE_PORT_SCENARIO2 }}"
     },
     "scenario3": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "scenario3",
-        "USER": "{{ default .Env.PGUSER "frepple" }}",
-        "PASSWORD": "{{ default .Env.PGPASSWORD "frepple" }}",
-        "HOST": "{{ default .Env.PGHOST "localhost" }}",
-        "PORT": "{{ default .Env.PGPORT "5432" }}",
-        "OPTIONS": {{ default .Env.FREPPLE_OPTIONS "{}" }},
-        "CONN_MAX_AGE": {{ default .Env.FREPPLE_CONN_MAX_AGE "60" }},
+        "USER": "{{ default "frepple" .Env.PGUSER }}",
+        "PASSWORD": "{{ default "frepple" .Env.PGPASSWORD }}",
+        "HOST": "{{ default "localhost" .Env.PGHOST }}",
+        "PORT": "{{ default "5432" .Env.PGPORT }}",
+        "OPTIONS": {{ default "{}" .Env.FREPPLE_OPTIONS }},
+        "CONN_MAX_AGE": {{ default "60" .Env.FREPPLE_CONN_MAX_AGE }},
         "TEST": {
             "NAME": "test_scenario3"  # Database name used when running the test suite.
         },
         "FILEUPLOADFOLDER": os.path.normpath(
             os.path.join(FREPPLE_LOGDIR, "data", "scenario3")
         ),
-        "SQL_ROLE": "{{ default .Env.FREPPLE_SQL_ROLE "report_role" }}",
-        "SECRET_WEBTOKEN_KEY": "{{ default .Env.FREPPLE_SECRET_WEBTOKEN_KEY "SECRET_KEY" }}",
-        "FREPPLE_PORT": "{{ default .Env.FREPPLE_PORT_SCENARIO3 "127.0.0.1:8005" }}"
+        "SQL_ROLE": "{{ default "report_role" .Env.FREPPLE_SQL_ROLE }}",
+        "SECRET_WEBTOKEN_KEY": "{{ default "SECRET_KEY" .Env.FREPPLE_SECRET_WEBTOKEN_KEY }}",
+        "FREPPLE_PORT": "{{ default "127.0.0.1:8005" .Env.FREPPLE_PORT_SCENARIO3 }}"
     },
 }
 
-LANGUAGE_CODE = "{{ default .Env.FREPPLE_LANGUAGE_CODE "en" }}"
-GOOGLE_ANALYTICS = {{ default .Env.FREPPLE_GOOGLE_ANALYTICS "None" }}  # "UA-1950616-4"
+LANGUAGE_CODE = "{{ default "en" .Env.FREPPLE_LANGUAGE_CODE }}"
+GOOGLE_ANALYTICS = {{ default "None" .Env.FREPPLE_GOOGLE_ANALYTICS }}  # "UA-1950616-4"
 
 # ================= END UPDATED BLOCK BY WINDOWS INSTALLER =================
 
 SUPPORT_USERS = []
 ODOO_PASSWORDS = {
-  "default": "{{ default .Env.FREPPLE_ODOO_PASSWORD_DEFAULT "" }}",
-  "scenario1": "{{ default .Env.FREPPLE_ODOO_PASSWORD_SCENARIO1 "" }}",
-  "scenario2": "{{ default .Env.FREPPLE_ODOO_PASSWORD_SCENARIO2 "" }}",
-  "scenario3": "{{ default .Env.FREPPLE_ODOO_PASSWORD_SCENARIO3 "" }}"
+  "default": "{{ default "" .Env.FREPPLE_ODOO_PASSWORD_DEFAULT }}",
+  "scenario1": "{{ default "" .Env.FREPPLE_ODOO_PASSWORD_SCENARIO1 }}",
+  "scenario2": "{{ default "" .Env.FREPPLE_ODOO_PASSWORD_SCENARIO2 }}",
+  "scenario3": "{{ default "" .Env.FREPPLE_ODOO_PASSWORD_SCENARIO3 }}"
 }
-TIME_ZONE = "{{ default .Env.FREPPLE_TIME_ZONE "America/Phoenix" }}"
+TIME_ZONE = "{{ default "America/Phoenix" .Env.FREPPLE_TIME_ZONE }}"
 LANGUAGES = (
     ("en", _("English")),
     ("fr", _("French")),
@@ -147,8 +147,8 @@ LANGUAGES = (
     ("zh-hant", _("Traditional Chinese")),
     ("uk", _("Ukrainian")),
 )
-SESSION_COOKIE_AGE = {{ default .Env.FREPPLE_SESSION_COOKIE_AGE "3600 * 24 * 3" }}  # 3 days
-SESSION_LOGOUT_IDLE_TIME = {{ default .Env.FREPPLE_SESSION_LOGOUT_IDLE_TIME "60" }}
+SESSION_COOKIE_AGE = {{ default "3600 * 24 * 3" .Env.FREPPLE_SESSION_COOKIE_AGE }}
+SESSION_LOGOUT_IDLE_TIME = {{ default "60" .Env.FREPPLE_SESSION_LOGOUT_IDLE_TIME }}
 MIDDLEWARE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -165,10 +165,9 @@ INSTALLED_APPS = (
   'django.contrib.messages',
   'django.contrib.staticfiles',
   'freppledb.boot',
-  {{ default .Env.FREPPLE_INSTALLED_APPS_CUSTOM "" }}
+  {{ default "" .Env.FREPPLE_INSTALLED_APPS_CUSTOM }}
   {{ if .Env.FREPPLE_INSTALLED_APPS_ODOO }}
   'freppledb.odoo',
-  'freppledb.erpconnection',
   {{ end }}
   {{ if .Env.FREPPLE_INSTALLED_APPS_FORECASTING }}
   'freppledb.demandhits',
@@ -187,14 +186,15 @@ INSTALLED_APPS = (
   'django_filters',
   'rest_framework',
   'django.contrib.admin',
+  'freppledb.archive',
   'freppledb.reportmanager',
   'freppledb.executesql',
 )
 
-ATTRIBUTES = {{ default .Env.FREPPLE_ATTRIBUTES "[]" }}
+ATTRIBUTES = {{ default "[]" .Env.FREPPLE_ATTRIBUTES }}
 
-CACHE_GRID_COUNT = {{ default .Env.FREPPLE_CACHE_GRID_COUNT "None" }}
-CACHE_PIVOT_COUNT = {{ default .Env.FREPPLE_CACHE_PIVOT_COUNT "None" }}
+CACHE_GRID_COUNT = {{ default "None" .Env.FREPPLE_CACHE_GRID_COUNT }}
+CACHE_PIVOT_COUNT = {{ default "None" .Env.FREPPLE_CACHE_PIVOT_COUNT }}
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
@@ -231,9 +231,9 @@ LOGGING = {
     },
 }
 
-MAXMEMORYSIZE = {{ default .Env.FREPPLE_MAXMEMORYSIZE "None" }}  # limit in MB, minimum around 230, use None for unlimited
-MAXCPUTIME = {{ default .Env.FREPPLE_MAXCPUTIME "None" }}  # limit in seconds, use None for unlimited
-MAXTOTALLOGFILESIZE = {{ default .Env.FREPPLE_MAXTOTALLOGFILESIZE "200" }}
+MAXMEMORYSIZE = {{ default "None" .Env.FREPPLE_MAXMEMORYSIZE }}  # limit in MB, minimum around 230, use None for unlimited
+MAXCPUTIME = {{ default "None" .Env.FREPPLE_MAXCPUTIME }}  # limit in seconds, use None for unlimited
+MAXTOTALLOGFILESIZE = {{ default "200" .Env.FREPPLE_MAXTOTALLOGFILESIZE }}
 THEMES = [
     "earth",
     "grass",
@@ -246,9 +246,9 @@ THEMES = [
     "water",
 ]
 
-DEFAULT_USER_GROUP = {{ default .Env.FREPPLE_DEFAULT_USER_GROUP "None" }}
-DEFAULT_THEME = "{{ default .Env.FREPPLE_DEFAULT_THEME "earth" }}"
-DEFAULT_PAGESIZE = {{ default .Env.FREPPLE_DEFAULT_PAGESIZE "100" }}
+DEFAULT_USER_GROUP = {{ default "None" .Env.FREPPLE_DEFAULT_USER_GROUP }}
+DEFAULT_THEME = "{{ default "earth" .Env.FREPPLE_DEFAULT_THEME }}"
+DEFAULT_PAGESIZE = {{ default "100" .Env.FREPPLE_DEFAULT_PAGESIZE }}
 DEFAULT_DASHBOARD = [
     {
         "rowname": _("Welcome"),
@@ -346,36 +346,36 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-EMAIL_USE_TLS = {{ default .Env.FREPPLE_EMAIL_USE_TLS "True" }}
-DEFAULT_FROM_EMAIL = "{{ default .Env.FREPPLE_DEFAULT_FROM_EMAIL "your_email@domain.com" }}"
-SERVER_EMAIL = "{{ default .Env.FREPPLE_SERVER_EMAIL "your_email@domain.com" }}"
-EMAIL_HOST_USER = "{{ default .Env.FREPPLE_EMAIL_HOST_USER "your_email@domain.com" }}"
-EMAIL_HOST_PASSWORD = "{{ default .Env.FREPPLE_EMAIL_HOST_PASSWORD "frePPLeIsTheBest" }}"
-EMAIL_HOST = {{ default .Env.FREPPLE_EMAIL_HOST "None" }}
-EMAIL_PORT = {{ default .Env.FREPPLE_EMAIL_PORT "25" }}
+EMAIL_USE_TLS = {{ default "True" .Env.FREPPLE_EMAIL_USE_TLS }}
+DEFAULT_FROM_EMAIL = "{{ default "your_email@domain.com" .Env.FREPPLE_DEFAULT_FROM_EMAIL }}"
+SERVER_EMAIL = "{{ default "your_email@domain.com" .Env.FREPPLE_SERVER_EMAIL }}"
+EMAIL_HOST_USER = "{{ default "your_email@domain.com" .Env.FREPPLE_EMAIL_HOST_USER }}"
+EMAIL_HOST_PASSWORD = "{{ default "frePPLeIsTheBest" .Env.FREPPLE_EMAIL_HOST_PASSWORD }}"
+EMAIL_HOST = {{ default "None" .Env.FREPPLE_EMAIL_HOST }}
+EMAIL_PORT = {{ default "25" .Env.FREPPLE_EMAIL_PORT }}
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 CONTENT_SECURITY_POLICY = "frame-ancestors 'self'"
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-FTP_PROTOCOL = "{{ default .Env.FREPPLE_FTP_PROTOCOL "SFTP" }}"
-FTP_HOST = {{ default .Env.FREPPLE_FTP_HOST "None" }}
-FTP_PORT = {{ default .Env.FREPPLE_FTP_PORT "22" }}
-FTP_USER = {{ default .Env.FREPPLE_FTP_USER "None" }}
-FTP_PASSWORD = {{ default .Env.FREPPLE_FTP_PASSWORD "None" }}
+FTP_PROTOCOL = "{{ default "SFTP" .Env.FREPPLE_FTP_PROTOCOL }}"
+FTP_HOST = {{ default "None" .Env.FREPPLE_FTP_HOST }}
+FTP_PORT = {{ default "22" .Env.FREPPLE_FTP_PORT }}
+FTP_USER = {{ default "None" .Env.FREPPLE_FTP_USER }}
+FTP_PASSWORD = {{ default "None" .Env.FREPPLE_FTP_PASSWORD }}
 FTP_FOLDER = {
-    "default": {{ default .Env.FREPPLE_FTP_FOLDER_DEFAULT "None" }},
-    "scenario1": {{ default .Env.FREPPLE_FTP_FOLDER_SCENARIO1 "None" }},
-    "scenario2": {{ default .Env.FREPPLE_FTP_FOLDER_SCENARIO2 "None" }},
-    "scenario3": {{ default .Env.FREPPLE_FTP_FOLDER_SCENARIO3 "None" }},
+    "default": {{ default "None" .Env.FREPPLE_FTP_FOLDER_DEFAULT }},
+    "scenario1": {{ default "None" .Env.FREPPLE_FTP_FOLDER_SCENARIO1 }},
+    "scenario2": {{ default "None" .Env.FREPPLE_FTP_FOLDER_SCENARIO2 }},
+    "scenario3": {{ default "None" .Env.FREPPLE_FTP_FOLDER_SCENARIO3 }},
 }
 
-PORT = {{ default .Env.FREPPLE_PORT "8000" }}
+PORT = {{ default "8000" .Env.FREPPLE_PORT }}
 
-SELENIUM_TESTS = "{{ default .Env.FREPPLE_SELENIUM_TESTS "chrome" }}"
-SELENIUM_HEADLESS = {{ default .Env.FREPPLE_SELENIUM_HEADLESS "True" }}
+SELENIUM_TESTS = "{{ default "chrome" .Env.FREPPLE_SELENIUM_TESTS }}"
+SELENIUM_HEADLESS = {{ default "True" .Env.FREPPLE_SELENIUM_HEADLESS }}
 
-CSRF_COOKIE_SAMESITE = {{ default .Env.FREPPLE_CSRF_COOKIE_SAMESITE "None" }}
-CSRF_COOKIE_SECURE = {{ default .Env.FREPPLE_CSRF_COOKIE_SECURE "True" }}
-SESSION_COOKIE_SAMESITE = {{ default .Env.FREPPLE_SESSION_COOKIE_SAMESITE "None" }}
-SESSION_COOKIE_SECURE = {{ default .Env.FREPPLE_SESSION_COOKIE_SECURE "True" }}
+CSRF_COOKIE_SAMESITE = {{ default "None" .Env.FREPPLE_CSRF_COOKIE_SAMESITE }}
+CSRF_COOKIE_SECURE = {{ default "True" .Env.FREPPLE_CSRF_COOKIE_SECURE }}
+SESSION_COOKIE_SAMESITE = {{ default "None" .Env.FREPPLE_SESSION_COOKIE_SAMESITE }}
+SESSION_COOKIE_SECURE = {{ default "True" .Env.FREPPLE_SESSION_COOKIE_SECURE }}
