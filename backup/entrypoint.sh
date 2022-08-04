@@ -144,8 +144,6 @@ function backup() {
         echo "Push, sync and cleanup to/on remote"
         rclone copy /tmp/$RUNNING_ENV-$PGDATABASE-$TODAY.sql.gz remote:/$REMOTE_BUCKET/
         rclone sync filestore:/$FILESTORE_BUCKET/ remote:/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$TODAY/
-        ! rclone purge remote:/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH/
-        ! rclone delete remote:/$REMOTE_BUCKET/$RUNNING_ENV-$PGDATABASE-$LASTMONTH.sql.gz
       fi
       ;;
     *)
