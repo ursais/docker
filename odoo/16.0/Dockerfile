@@ -13,6 +13,7 @@ RUN apt update \
         libssl-dev \
         node-less \
         npm \
+        postgresql-client \
         python3-num2words \
         python3-pip \
         python3-phonenumbers \
@@ -26,23 +27,12 @@ RUN apt update \
         python3-wheel \
         python3-xlrd \
         python3-xlwt \
+        wkhtmltopdf \
         xz-utils \
-    && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.focal_amd64.deb \
-    && echo 'ae4e85641f004a2097621787bf4381e962fb91e1 wkhtmltox.deb' | sha1sum -c - \
-    && apt install -y --no-install-recommends ./wkhtmltox.deb \
-    && rm -rf /var/lib/apt/lists/* wkhtmltox.deb
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Rclone
 RUN curl https://rclone.org/install.sh | bash
-
-# install latest postgresql-client
-ENV PGVERSION=14
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main' > /etc/apt/sources.list.d/pgdg.list \
-    && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt update  \
-    && apt install --no-install-recommends -y postgresql-client-$PGVERSION \
-    && rm -f /etc/apt/sources.list.d/pgdg.list \
-    && rm -rf /var/lib/apt/lists/*
 
 # Install Odoo
 ENV ODOO_VERSION 16.0
