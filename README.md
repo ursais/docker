@@ -35,6 +35,8 @@ This repository contains Dockerfile files used to build solutions provided by
 * [12.0](https://github.com/ursais/docker/blob/master/odoo/12.0/Dockerfile)
 * [13.0](https://github.com/ursais/docker/blob/master/odoo/13.0/Dockerfile)
 * [14.0](https://github.com/ursais/docker/blob/master/odoo/14.0/Dockerfile)
+* [15.0](https://github.com/ursais/docker/blob/master/odoo/15.0/Dockerfile)
+* [16.0](https://github.com/ursais/docker/blob/master/odoo/16.0/Dockerfile)
 
 ## Nginx
 
