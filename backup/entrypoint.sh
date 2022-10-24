@@ -120,6 +120,7 @@ function restore_odoo_database() {
  UPDATE ir_mail_server SET active = 'f';
  UPDATE fetchmail_server SET active = 'f';
  UPDATE ir_config_parameter SET value = 'null' WHERE key = 'database.uuid';
+ UPDATE queue_job SET state = 'pending' WHERE state in ('started', 'enqueued');
  " $PGDATABASE
 }
 
