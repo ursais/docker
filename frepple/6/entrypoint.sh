@@ -37,11 +37,11 @@ then
   echo "Creating $PGDATABASE databases"
   createdb $PGDATABASE
   echo "Create FrePPLe databases"
-  frepplectl migrate --noinput
   frepplectl createdatabase --database=scenario1
   frepplectl createdatabase --database=scenario2
   frepplectl createdatabase --database=scenario3
 fi
+frepplectl migrate --noinput
 
 echo "Configure atd"
 echo www-data > /etc/at.allow
