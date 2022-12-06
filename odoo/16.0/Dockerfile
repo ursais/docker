@@ -51,11 +51,11 @@ COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Copy Odoo addons
-#COPY src/odoo-cloud-platform/attachment_azure /odoo/addons/attachment_azure
-#COPY src/odoo-cloud-platform/attachment_s3 /odoo/addons/attachment_s3
-#COPY src/odoo-cloud-platform/base_attachment_object_storage /odoo/addons/base_attachment_object_storage
-#COPY src/odoo-cloud-platform/monitoring_status /odoo/addons/monitoring_status
-#COPY src/odoo-cloud-platform/session_redis /odoo/addons/session_redis
+COPY src/odoo-cloud-platform/attachment_azure /odoo/addons/attachment_azure
+COPY src/odoo-cloud-platform/attachment_s3 /odoo/addons/attachment_s3
+COPY src/odoo-cloud-platform/base_attachment_object_storage /odoo/addons/base_attachment_object_storage
+COPY src/odoo-cloud-platform/monitoring_status /odoo/addons/monitoring_status
+COPY src/odoo-cloud-platform/session_redis /odoo/addons/session_redis
 
 # Expose Odoo services
 EXPOSE 8069 8072
