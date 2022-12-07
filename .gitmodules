@@ -19,4 +19,4 @@
 	branch = 15.0
 [submodule "odoo/16.0/src/odoo-cloud-platform"]
 	path = odoo/16.0/src/odoo-cloud-platform
-	url = https://github.com/camptocamp/odoo-cloud-platform.git
+	url = https://github.com/ursais/odoo-cloud-platform.git
