@@ -27,8 +27,10 @@ RUN apt update \
         python3-wheel \
         python3-xlrd \
         python3-xlwt \
-        wkhtmltopdf \
         xz-utils \
+    && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.jammy_amd64.deb \
+    && echo '800eb1c699d07238fee77bf9df1556964f00ffcf wkhtmltox.deb' | sha1sum -c - \
+    && apt install -y --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Rclone
