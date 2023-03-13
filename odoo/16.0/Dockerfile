@@ -28,10 +28,19 @@ RUN apt update \
         python3-xlrd \
         python3-xlwt \
         xz-utils \
-    && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.jammy_amd64.deb \
-    && echo '800eb1c699d07238fee77bf9df1556964f00ffcf wkhtmltox.deb' | sha1sum -c - \
-    && apt install -y --no-install-recommends ./wkhtmltox.deb \
+        xfonts-75dpi \
+        libx11-6 \
+        fontconfig \
+        xfonts-base \
+        libxrender1 \
+        libxext6 \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -sLO "https://github.com/wkhtmltopdf/packaging/files/8632951/wkhtmltox_0.12.5-1.jammy_amd64.zip" && \
+    unzip wkhtmltox_0.12.5-1.jammy_amd64.zip && \
+    dpkg -i "wkhtmltox_0.12.5-1.jammy_amd64.deb"
+
+
 
 # Install Rclone
 RUN curl https://rclone.org/install.sh | bash
