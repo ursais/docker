@@ -1,0 +1,77 @@
+version: "2"
+services:
+  frepple-db:
+    image: ursa/postgresql:latest
+    restart: always
+    environment:
+      - POSTGRES_DBNAME=postgres
+      - POSTGRES_USER=frepple
+      - POSTGRES_PASSWORD=frepple
+      - POSTGRES_DATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - "postgres-data:/var/lib/postgresql/data"
+
+  frepple-app:
+    build:
+      context: frepple
+    ports:
+      - "8080:80"
+    depends_on:
+      - frepple-db
+    environment:
+      - FREPPLE_ADMIN_EMAIL=support@opensourceintegrators.com
+      - FREPPLE_ADMIN_NAME=Open Source Integrators
+      - FREPPLE_SECRET_KEY=frepple-test
+      - FREPPLE_OPTIONS={}
+      - FREPPLE_CONN_MAX_AGE=60
+      - FREPPLE_TEST_NAME=test_frepple
+      - FREPPLE_LOGDIR=/var/log/frepple
+      - FREPPLE_SQL_ROLE=report_role
+        #- FREPPLE_PORT_DEFAULT=127.0.0.1:8002
+      - FREPPLE_LANGUAGE_CODE=en
+      - FREPPLE_GOOGLE_ANALYTICS=None
+      - FREPPLE_TIME_ZONE=UTC
+      - FREPPLE_SESSION_COOKIE_AGE=3600 * 24 * 3
+      - FREPPLE_ATTRIBUTES=[]
+      - FREPPLE_MAXMEMORYSIZE=None
+      - FREPPLE_MAXCPUTIME=None
+      - FREPPLE_MAXTOTALLOGFILESIZE=200
+      - FREPPLE_DEFAULT_USER_GROUP=None
+      - FREPPLE_DEFAULT_PAGESIZE=100
+      - FREPPLE_DEFAULT_THEME=earth
+        #- FREPPLE_PORT=8000
+      # Apps
+      - FREPPLE_INSTALLED_APPS_CUSTOM='freppledb.custom',
+      - FREPPLE_INSTALLED_APPS_FORECASTING=true
+      - FREPPLE_INSTALLED_APPS_INVENTORY=true
+      - FREPPLE_INSTALLED_APPS_ODOO=true
+      # PostgreSQL
+      - POSTGRES_DBNAME=frepple
+      - POSTGRES_HOST=frepple-db
+      - POSTGRES_USER=frepple
+      - POSTGRES_PASSWORD=frepple
+      # Email
+      - FREPPLE_EMAIL_USE_TLS=True
+      - FREPPLE_DEFAULT_FROM_EMAIL=example@example.com
+      - FREPPLE_SERVER_EMAIL=example@example.com
+      - FREPPLE_EMAIL_HOST_USER=example@example.com
+      - FREPPLE_EMAIL_HOST_PASSWORD=test
+      - FREPPLE_EMAIL_HOST='placeholder'
+        #- FREPPLE_EMAIL_PORT=465
+      # Selenium
+      - FREPPLE_SELENIUM_TESTS=chrome
+      - FREPPLE_SELENIUM_HEADLESS=True
+      # Odoo
+      - FREPPLE_ODOO_PASSWORD_DEFAULT=test
+      - FREPPLE_ODOO_PASSWORD_SCENARIO1=test
+      - FREPPLE_ODOO_PASSWORD_SCENARIO2=test
+      - FREPPLE_ODOO_PASSWORD_SCENARIO3=test
+      - FREPPLE_CSRF_COOKIE_SAMESITE=None
+      - FREPPLE_CSRF_COOKIE_SECURE=True
+      - FREPPLE_SESSION_COOKIE_SAMESITE=None
+      - FREPPLE_SESSION_COOKIE_SECURE=True
+
+
+volumes:
+  postgres-data:
+
