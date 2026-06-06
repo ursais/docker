@@ -36,6 +36,19 @@ jobs:
             cd $OLD_PWD
           done
 
+      - name: "Operating Systems"
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $OS -name Dockerfile | sort -r`; do
+            echo "Building $image..."
+            DIR=$(dirname $image)
+            IMAGE_ID=$(echo $DIR | sed -e 's/^\.\///g' -e 's/\//-/g')
+            cd $DIR
+            docker build . --file Dockerfile --no-cache --tag $IMAGE_ID:latest
+            echo "Build of $image completed!"
+            cd $OLD_PWD
+          done
+
       - name: "Lint Applications"
         run: |
           OLD_PWD=$(pwd)
@@ -43,18 +56,6 @@ jobs:
             echo "Linting $image..."
             cd $(dirname $image)
             docker build . --file Dockerfile --check
-            cd $OLD_PWD
-          done
-
-      - name: "Operating Systems"
-        run: |
-          OLD_PWD=$(pwd)
-          for image in `find $OS -name Dockerfile | sort -r`; do
-            echo "Building $image..."
-            cd $(dirname $image)
-            docker build . --file Dockerfile --no-cache
-            echo "Build of $image completed!"
-            ! docker system prune -a -f
             cd $OLD_PWD
           done
 
