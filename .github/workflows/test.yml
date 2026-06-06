@@ -65,11 +65,18 @@ jobs:
 
       - name: "Applications"
         run: |
+          set -euo pipefail
           OLD_PWD=$(pwd)
           for image in `find $APPS -name Dockerfile | sort -r`; do
-            echo "Building $image..."
+            echo "::group::Building $image"
             cd $(dirname $image)
-            docker build . --file Dockerfile --no-cache
+            docker build . --file Dockerfile --no-cache --progress=plain 2>&1
+            STATUS=$?
+            echo "::endgroup::"
+            if [ $STATUS -ne 0 ]; then
+              echo "::error::Build failed for $image (exit $STATUS)"
+              exit $STATUS
+            fi
             ! docker image prune -f
             echo "Build of $image completed!"
             cd $OLD_PWD
