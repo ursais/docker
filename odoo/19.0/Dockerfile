@@ -1,5 +1,5 @@
 FROM ubuntu-24.04:latest
-LABEL MAINTAINER="Gray Matter Logic <support@graymatterlogic.com>"
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 # Install some dependencies
 RUN apt update \
