@@ -3,7 +3,7 @@ on:
   pull_request:
 
 env:
-  APPS: "backup postgresql pyspy"
+  APPS: "backup odoo postgresql pyspy"
   LINT_APPS: "postgresql pyspy"
   OS: "ubuntu"
   REGISTRY: ghcr.io
