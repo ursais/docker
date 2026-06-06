@@ -1,3 +1,4 @@
 helm-extra-args: --timeout 600
 check-version-increment: false
+target-branch: master
 debug: true
