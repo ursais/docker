@@ -26,6 +26,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: "Lint Operating Systems"
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $OS -name Dockerfile | sort -r`; do
+            echo "Linting $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile --check
+            cd $OLD_PWD
+          done
+
+      - name: "Lint Applications"
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $APPS -name Dockerfile | sort -r`; do
+            echo "Linting $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile --check
+            cd $OLD_PWD
+          done
+
       - name: "Operating Systems"
         run: |
           OLD_PWD=$(pwd)
