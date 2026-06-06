@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
       - name: Set up Helm
@@ -25,7 +25,7 @@ jobs:
     needs: lint-chart
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
       - name: Run helm-docs
         run: .github/helm-docs.sh
 
@@ -42,7 +42,7 @@ jobs:
           - v1.19.7
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
       - name: Run kubeval
         env:
           KUBERNETES_VERSION: ${{ matrix.k8s }}
@@ -63,7 +63,7 @@ jobs:
           - v1.19.7
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
       - name: Set up Helm
