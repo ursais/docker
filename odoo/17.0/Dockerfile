@@ -1,5 +1,5 @@
 FROM ursa/ubuntu-22.04:latest
-LABEL org.opencontainers.image.authors="Open Source Integrators <support@opensourceintegrators.com>"
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 # Install some dependencies
 RUN apt update \

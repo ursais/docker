@@ -1,6 +1,6 @@
 #FROM 880063853698.dkr.ecr.us-west-2.amazonaws.com/strymon-frepple:frepple-8-0-3-official
 FROM ghcr.io/frepple/frepple-enterprise:8.0.3
-LABEL org.opencontainers.image.authors="Open Source Integrators <support@opensourceintegrators.com>"
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 
 # Update the PostgreSQL client to match the server

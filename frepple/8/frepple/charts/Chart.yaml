@@ -3,7 +3,7 @@ name: frepple
 version: 1.0
 appVersion: 8.0.3
 description: FrePPLe 8
-home: https://www.opensourceintegrators.com
+home: https://www.graymatterlogic.com
 icon: https://github.com/ursais.png?width=64
 keywords:
 - advanced planning system
@@ -15,6 +15,6 @@ keywords:
 sources:
 - https://github.com/ursais/docker
 maintainers:
-- name: Open Source Integrators
-  email: support@opensourceintegrators.com
+- name: Gray Matter Logic
+  email: support@graymatterlogic.com
 engine: gotpl

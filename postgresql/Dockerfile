@@ -1,5 +1,5 @@
 FROM postgres:14
-LABEL org.opencontainers.image.authors="Open Source Integrators <support@opensourceintegrators.com>"
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

@@ -1,5 +1,5 @@
 FROM ubuntu:jammy
-LABEL org.opencontainers.image.authors="Open Source Integrators <support@opensourceintegrators.com>"
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 

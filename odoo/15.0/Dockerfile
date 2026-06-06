@@ -1,5 +1,5 @@
 FROM ursa/ubuntu-20.04:latest
-LABEL org.opencontainers.image.authors="Open Source Integrators <support@opensourceintegrators.com>"
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt update \
