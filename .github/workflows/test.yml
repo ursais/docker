@@ -67,7 +67,7 @@ jobs:
             echo "Building $image..."
             cd $(dirname $image)
             docker build . --file Dockerfile --no-cache
-            ! docker system prune -a -f
+            ! docker image prune -f
             echo "Build of $image completed!"
             cd $OLD_PWD
           done
