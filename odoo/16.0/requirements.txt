@@ -1,8 +1,0 @@
-anthem
-azure-storage-blob
-boto3
-marabunta
-numpy
-openupgradelib
-redis
-urllib3

@@ -1,13 +1,14 @@
-FROM ursa/ubuntu-22.04:latest
-MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
+FROM ubuntu-24.04:latest
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 # Install some dependencies
 RUN apt update \
     && apt install -y --no-install-recommends \
-       # For the entrypoint.sh
-       gosu \
-       # To install additional Python dependencies
-       python3-pip \
+      # To install additional Python dependencies \
+      python3-numpy \
+      python3-pip \
+      python3-redis \
+      python3-urllib3 \
     && apt clean all
 
 # Install wkhtmltopdf with Qt patch
@@ -16,11 +17,8 @@ RUN curl -o wkhtmltox.deb -sL0 "https://github.com/wkhtmltopdf/packaging/release
     && apt -y install --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* ./wkhtmltox.deb
 
-# Install Rclone
-RUN curl https://rclone.org/install.sh | bash
-
 # Install Odoo
-ENV ODOO_VERSION 17.0
+ENV ODOO_VERSION=19.0
 ARG ODOO_RELEASE=latest
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
     && apt update \
@@ -36,18 +34,18 @@ COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Copy Odoo addons
-# COPY src/odoo-cloud-platform/monitoring_status /odoo/addons/monitoring_status
-# COPY src/odoo-cloud-platform/session_redis /odoo/addons/session_redis
+COPY src/odoo-cloud-platform/monitoring_status /odoo/addons/monitoring_status
+COPY src/odoo-cloud-platform/session_redis /odoo/addons/session_redis
 
 # Expose Odoo services
 EXPOSE 8069 8072
 
-RUN pip3 install -r /odoo/requirements.txt
+RUN pip3 install --break-system-packages -r /odoo/requirements.txt
 
 RUN chown -R odoo /odoo
 
 # Set the default config file
-ENV ODOO_RC /odoo/odoo.conf
+ENV ODOO_RC=/odoo/odoo.conf
 
 VOLUME /odoo/data
 

@@ -3,27 +3,60 @@ on:
   pull_request:
 
 env:
-  APPS: "backup frepple odoo postgresql pyspy"
-  OS: "centos debian redhat ubuntu"
+  APPS: "backup odoo postgresql pyspy"
+  LINT_APPS: "postgresql pyspy"
+  OS: "ubuntu"
+  REGISTRY: ghcr.io
   DOCKER_BUILDKIT: 1
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Lint Operating Systems"
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $OS -name Dockerfile | sort -r`; do
+            echo "Linting $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile --check
+            cd $OLD_PWD
+          done
 
       - name: "Operating Systems"
         run: |
           OLD_PWD=$(pwd)
           for image in `find $OS -name Dockerfile | sort -r`; do
             echo "Building $image..."
-            cd $(dirname $image)
-            docker build . --file Dockerfile --no-cache
+            DIR=$(dirname $image)
+            IMAGE_ID=$(echo $DIR | sed -e 's/^\.\///g' -e 's/\//-/g')
+            cd $DIR
+            docker build . --file Dockerfile --no-cache --tag $IMAGE_ID:latest
             echo "Build of $image completed!"
-            ! docker system prune -a -f
+            cd $OLD_PWD
+          done
+
+      - name: "Lint Applications"
+        run: |
+          OLD_PWD=$(pwd)
+          for image in `find $LINT_APPS -name Dockerfile | sort -r`; do
+            echo "Linting $image..."
+            cd $(dirname $image)
+            docker build . --file Dockerfile --check
             cd $OLD_PWD
           done
 
@@ -34,7 +67,7 @@ jobs:
             echo "Building $image..."
             cd $(dirname $image)
             docker build . --file Dockerfile --no-cache
-            ! docker system prune -a -f
+            ! docker image prune -f
             echo "Build of $image completed!"
             cd $OLD_PWD
           done

@@ -1,5 +1,5 @@
-FROM ursa/ubuntu-20.04:latest
-MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
+FROM ubuntu-24.04:latest
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 # Install some deps
 RUN apt update \
@@ -9,23 +9,14 @@ RUN apt update \
       gnupg \
       gzip \
       openssh-client \
+      postgresql-client \
+      rclone \
       rsync \
       tar \
       wget \
       zip \
     && apt clean all
 
-# Install Rclone
-RUN curl https://rclone.org/install.sh | bash
-
-# Update the PostgreSQL client
-ENV PGVERSION=14
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-    && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt update \
-    && apt install -y --no-install-recommends postgresql-client-$PGVERSION \
-    && rm -f /etc/apt/sources.list.d/pgdg.list \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy files
 COPY entrypoint.sh /

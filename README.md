@@ -17,7 +17,7 @@
 * [Support](https://github.com/ursais/docker#Support)
 
 This repository contains Dockerfile files used to build solutions provided by
-[Open Source Integrators](https://www.opensourceintegrators.com).
+[Gray Matter Logic](https://www.graymatterlogic.com).
 
 
 # Applications

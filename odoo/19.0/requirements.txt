@@ -1,8 +1,5 @@
-anthem
+click-odoo-contrib
 boto3
 marabunta
-numpy
 odoo-addon-web-environment-ribbon
 openupgradelib
-redis
-urllib3

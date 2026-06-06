@@ -19,8 +19,8 @@ services:
     depends_on:
       - frepple-db
     environment:
-      - FREPPLE_ADMIN_EMAIL=support@opensourceintegrators.com
-      - FREPPLE_ADMIN_NAME=Open Source Integrators
+      - FREPPLE_ADMIN_EMAIL=support@graymatterlogic.com
+      - FREPPLE_ADMIN_NAME=Gray Matter Logic
       - FREPPLE_SECRET_KEY=frepple-test
       - FREPPLE_OPTIONS={}
       - FREPPLE_CONN_MAX_AGE=60

@@ -3,7 +3,7 @@ name: postgresql
 version: 2.0
 appVersion: 14.0
 description: PostgreSQL 14
-home: https://www.opensourceintegrators.com
+home: https://www.graymatterlogic.com
 icon: https://github.com/ursais.png?width=64
 keywords:
 - database
@@ -12,6 +12,6 @@ keywords:
 sources:
 - https://github.com/ursais/docker
 maintainers:
-- name: Open Source Integrators
-  email: support@opensourceintegrators.com
+- name: Gray Matter Logic
+  email: support@graymatterlogic.com
 engine: gotpl
