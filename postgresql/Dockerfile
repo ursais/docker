@@ -1,12 +1,11 @@
-FROM postgres:14
+FROM postgres:16
 LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         htop \
         iotop \
-        postgresql-14-postgis-3 \
-        postgresql-14-postgis-3-scripts \
+        postgresql-postgis-scripts \
         postgresql-contrib \
         pg-activity \
         vim \
