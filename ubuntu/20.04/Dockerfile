@@ -23,6 +23,5 @@ RUN apt update \
   && apt autoremove
 
 # Install dockerize for config files
-RUN curl -sfL $(curl -s https://api.github.com/repos/powerman/dockerize/releases/latest \
-  | grep -i /dockerize-$(uname -s)-$(uname -m)\" | cut -d\" -f4) \
+RUN curl -sfL https://github.com/powerman/dockerize/releases/download/v0.24.3/dockerize-v0.24.3-linux-amd64 \
   | install /dev/stdin /usr/local/bin/dockerize
