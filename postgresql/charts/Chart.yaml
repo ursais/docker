@@ -1,17 +1,17 @@
-apiVersion: v1
+apiVersion: v2
 name: postgresql
-version: 2.1
-appVersion: 14.0
-description: PostgreSQL 14
+version: 2.1.0
+appVersion: "16"
+description: PostgreSQL 16 with PostGIS and extensions
 home: https://www.graymatterlogic.com
 icon: https://github.com/ursais.png?width=64
 keywords:
-- database
-- rdbms
-- postgresql
+  - database
+  - rdbms
+  - postgresql
 sources:
-- https://github.com/ursais/docker
+  - https://github.com/ursais/docker
 maintainers:
-- name: Gray Matter Logic
-  email: support@graymatterlogic.com
-engine: gotpl
+  - name: Gray Matter Logic
+    email: support@graymatterlogic.com
+type: application
