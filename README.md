@@ -1,82 +1,65 @@
-# OSI Docker Images
+# Gray Matter Logic Docker Images
 
-# Table of Contents
-* [Applications](https://github.com/ursais/docker#Applications)
-  * [Apache](https://github.com/ursais/docker#Apache)
-  * [FrePPLe](https://github.com/ursais/docker#FrePPLe)
-  * [Odoo](https://github.com/ursais/docker#Odoo)
-  * [Nginx](https://github.com/ursais/docker#Nginx)
-  * [PostgreSQL](https://github.com/ursais/docker#PostgreSQL)
-  * [ProFTPD](https://github.com/ursais/docker#ProFTPD)
-  * [Tools](https://github.com/ursais/docker#Tools)
-* [Operating Systems](https://github.com/ursais/docker#Operating-Systems)
-  * [CentOS](https://github.com/ursais/docker#CentOS)
-  * [Debian](https://github.com/ursais/docker#Debian)
-  * [Red Hat](https://github.com/ursais/docker#Red-Hat)
-  * [Ubuntu](https://github.com/ursais/docker#Ubuntu)
-* [Support](https://github.com/ursais/docker#Support)
+| Workflow | Status |
+|---|---|
+| Test | [![Test](https://github.com/ursais/docker/actions/workflows/test.yml/badge.svg)](https://github.com/ursais/docker/actions/workflows/test.yml) |
+| Publish | [![Publish](https://github.com/ursais/docker/actions/workflows/publish.yml/badge.svg)](https://github.com/ursais/docker/actions/workflows/publish.yml) |
 
-This repository contains Dockerfile files used to build solutions provided by
+This repository contains Dockerfiles used to build solutions provided by
 [Gray Matter Logic](https://www.graymatterlogic.com).
 
+Images are published to the [GitHub Container Registry](https://github.com/orgs/ursais/packages?repo_name=docker)
+as `ghcr.io/ursais/<image>:<tag>`.
 
-# Applications
+## Table of Contents
 
-## Apache
+* [Applications](#applications)
+  * [FrePPLe](#frepple)
+  * [Odoo](#odoo)
+  * [PostgreSQL](#postgresql)
+  * [Tools](#tools)
+* [Operating Systems](#operating-systems)
+  * [Ubuntu](#ubuntu)
+* [Support](#support)
 
-* [2](https://github.com/ursais/docker/blob/master/apache/2/Dockerfile) (Todo)
+## Applications
 
-## FrePPLe
+### FrePPLe
 
-* [6](https://github.com/ursais/docker/blob/master/frepple/6/Dockerfile)
+| Version | Dockerfile |
+|---|---|
+| 8 | [frepple/8](https://github.com/ursais/docker/blob/master/frepple/8/frepple/Dockerfile) |
 
-## Odoo
+### Odoo
 
-* [12.0](https://github.com/ursais/docker/blob/master/odoo/12.0/Dockerfile)
-* [13.0](https://github.com/ursais/docker/blob/master/odoo/13.0/Dockerfile)
-* [14.0](https://github.com/ursais/docker/blob/master/odoo/14.0/Dockerfile)
-* [15.0](https://github.com/ursais/docker/blob/master/odoo/15.0/Dockerfile)
-* [16.0](https://github.com/ursais/docker/blob/master/odoo/16.0/Dockerfile)
+| Version | Image |
+|---|---|
+| 19.0 | `ghcr.io/ursais/odoo-19.0:latest` |
 
-## Nginx
+Base image: `ghcr.io/ursais/ubuntu-24.04:latest`
 
-* [1](https://github.com/ursais/docker/blob/master/nginx/1/Dockerfile) (Todo)
+### PostgreSQL
 
-## PostgreSQL
+| Version | Image |
+|---|---|
+| 16 | `ghcr.io/ursais/postgresql:latest` |
 
-* [14](https://github.com/ursais/docker/blob/master/postgresql/Dockerfile)
+### Tools
 
-## ProFTPD
+| Tool | Image |
+|---|---|
+| Backup | `ghcr.io/ursais/backup:latest` |
+| PySpy | `ghcr.io/ursais/pyspy:latest` |
 
-* [1](https://github.com/ursais/docker/blob/master/proftpd/1/Dockerfile) (Todo)
+## Operating Systems
 
-## Tools
+### Ubuntu
 
-* [Backup](https://github.com/ursais/docker/blob/master/backup/Dockerfile)
-* [MailHog](https://github.com/ursais/docker/blob/master/mailhog/Dockerfile) (Todo)
-* [PySpy]((https://github.com/ursais/docker/blob/master/pyspy/Dockerfile))
+| Version | Image |
+|---|---|
+| 24.04 | `ghcr.io/ursais/ubuntu-24.04:latest` |
 
-# Operating Systems
-
-## CentOS
-
-* [8](https://github.com/ursais/docker/blob/master/centos/8/Dockerfile)
-
-## Debian
-
-* [10](https://github.com/ursais/docker/blob/master/debian/10/Dockerfile)
-
-## Red Hat
-
-* [8](https://github.com/ursais/docker/blob/master/redhat/8/Dockerfile)
-
-## Ubuntu
-
-* [18.04](https://github.com/ursais/docker/blob/master/ubuntu/18.04/Dockerfile)
-* [20.04](https://github.com/ursais/docker/blob/master/ubuntu/20.04/Dockerfile)
-* [22.04](https://github.com/ursais/docker/blob/master/ubuntu/22.04/Dockerfile)
-
-# Support
+## Support
 
 Report any problem or question by creating an issue on the
 [GitHub project](https://github.com/ursais/docker/issues).
