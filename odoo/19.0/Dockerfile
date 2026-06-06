@@ -4,16 +4,21 @@ LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlog
 # Retrieve the target architecture to install the correct wkhtmltopdf package
 ARG TARGETARCH
 
-# Install some dependencies
+# Install dependencies including wkhtmltopdf compatibility libs
 RUN apt update \
     && apt install -y --no-install-recommends \
       python3-numpy \
       python3-pip \
       python3-redis \
       python3-urllib3 \
+      fontconfig \
+      libx11-6 \
+      libxcb1 \
+      libxext6 \
+      libxrender1 \
     && apt clean all
 
-# Install wkhtmltopdf with Qt patch (jammy .deb works on Noble/24.04)
+# Install wkhtmltopdf with Qt patch (jammy .deb, works on Noble/24.04)
 RUN if [ -z "${TARGETARCH}" ]; then TARGETARCH="$(dpkg --print-architecture)"; fi; \
     case ${TARGETARCH} in \
       "amd64") WKHTMLTOPDF_SHA=967390a759707337b46d1c02452e2bb6b2dc6d59 ;; \
