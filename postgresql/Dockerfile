@@ -1,5 +1,5 @@
 FROM postgres:14
-MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
+LABEL org.opencontainers.image.authors="Open Source Integrators <support@opensourceintegrators.com>"
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

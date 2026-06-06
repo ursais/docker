@@ -1,5 +1,5 @@
 FROM ursa/ubuntu-22.04:latest
-MAINTAINER Open Source Integrators <support@opensourceintegrators.com>
+LABEL org.opencontainers.image.authors="Open Source Integrators <support@opensourceintegrators.com>"
 
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 RUN apt update \
@@ -46,7 +46,7 @@ RUN curl -sLO "https://github.com/wkhtmltopdf/packaging/files/8632951/wkhtmltox_
 RUN curl https://rclone.org/install.sh | bash
 
 # Install Odoo
-ENV ODOO_VERSION 16.0
+ENV ODOO_VERSION=16.0
 ARG ODOO_RELEASE=latest
 RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
     && apt update \
@@ -76,7 +76,7 @@ RUN pip3 install -r /odoo/requirements.txt
 RUN chown -R odoo /odoo
 
 # Set the default config file
-ENV ODOO_RC /odoo/odoo.conf
+ENV ODOO_RC=/odoo/odoo.conf
 
 VOLUME /odoo/data
 
