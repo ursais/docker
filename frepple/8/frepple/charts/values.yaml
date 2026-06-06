@@ -1,9 +1,0 @@
-name: frepple
-adminName: frepple
-adminEmail: admin@example.com
-secretKey: frepple
-secretWebtokenKey: frepple
-pgdatabase: frepple
-pghost: db
-pgpassword: frepple
-pguser: frepple
