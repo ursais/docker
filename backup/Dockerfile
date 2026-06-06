@@ -1,4 +1,4 @@
-FROM ubuntu-24.04:latest
+FROM ghcr.io/ursais/ubuntu-24.04:latest
 LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 # Install some deps

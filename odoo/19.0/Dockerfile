@@ -1,18 +1,31 @@
-FROM ubuntu-24.04:latest
+FROM ghcr.io/ursais/ubuntu-24.04:latest
 LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
-# Install some dependencies
+# Retrieve the target architecture to install the correct wkhtmltopdf package
+ARG TARGETARCH
+
+# Install dependencies including wkhtmltopdf compatibility libs
 RUN apt update \
     && apt install -y --no-install-recommends \
-      # To install additional Python dependencies \
       python3-numpy \
       python3-pip \
       python3-redis \
       python3-urllib3 \
+      fontconfig \
+      libx11-6 \
+      libxcb1 \
+      libxext6 \
+      libxrender1 \
     && apt clean all
 
-# Install wkhtmltopdf with Qt patch
-RUN curl -o wkhtmltox.deb -sL0 "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb" \
+# Install wkhtmltopdf with Qt patch (jammy .deb, works on Noble/24.04)
+RUN if [ -z "${TARGETARCH}" ]; then TARGETARCH="$(dpkg --print-architecture)"; fi; \
+    case ${TARGETARCH} in \
+      "amd64") WKHTMLTOPDF_SHA=967390a759707337b46d1c02452e2bb6b2dc6d59 ;; \
+      "arm64") WKHTMLTOPDF_SHA=90f6e69896d51ef77339d3f3a20f8582bdf496cc ;; \
+    esac \
+    && curl -o wkhtmltox.deb -sSL "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_${TARGETARCH}.deb" \
+    && echo "${WKHTMLTOPDF_SHA} wkhtmltox.deb" | sha1sum -c - \
     && apt update \
     && apt -y install --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* ./wkhtmltox.deb
