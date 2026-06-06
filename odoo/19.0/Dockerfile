@@ -17,9 +17,6 @@ RUN curl -o wkhtmltox.deb -sL0 "https://github.com/wkhtmltopdf/packaging/release
     && apt -y install --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* ./wkhtmltox.deb
 
-# Install Rclone
-RUN curl https://rclone.org/install.sh | bash
-
 # Install Odoo
 ENV ODOO_VERSION=19.0
 ARG ODOO_RELEASE=latest
