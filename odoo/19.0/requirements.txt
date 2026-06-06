@@ -1,0 +1,5 @@
+anthem
+boto3
+marabunta
+odoo-addon-web-environment-ribbon
+openupgradelib
