@@ -9,22 +9,27 @@ on:
 env:
   APPS: "backup frepple odoo postgresql pyspy"
   OS: "centos debian redhat ubuntu"
-  ORG: ursa
+  REGISTRY: ghcr.io
+  ORG: ${{ github.repository_owner }}
   DOCKER_BUILDKIT: 1
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Operating Systems"
         run: |
@@ -36,9 +41,9 @@ jobs:
             cd $DIR
             VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
             [ "$VERSION" == "master" ] && VERSION=latest
-            docker build . --file Dockerfile --tag ${{ env.ORG }}/$IMAGE_ID:$VERSION --no-cache
+            docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:$VERSION --no-cache
             echo "Build of $image completed!"
-            docker push ${{ env.ORG }}/$IMAGE_ID:$VERSION
+            docker push ${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:$VERSION
             ! docker system prune -a -f
             cd $OLD_PWD
           done
@@ -53,9 +58,9 @@ jobs:
             cd $DIR
             VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
             [ "$VERSION" == "master" ] && VERSION=latest
-            docker build . --file Dockerfile --tag ${{ env.ORG }}/$IMAGE_ID:$VERSION --no-cache
+            docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:$VERSION --no-cache
             echo "Build of $image completed!"
-            docker push ${{ env.ORG }}/$IMAGE_ID:$VERSION
+            docker push ${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:$VERSION
             ! docker system prune -a -f
             cd $OLD_PWD
           done
