@@ -1,5 +1,5 @@
-FROM ursa/ubuntu-24.04:latest
-LABEL MAINTAINER="Gray Matter Logic <support@graymatterlogic.com>"
+FROM ursa/ubuntu-20.04:latest
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 # Install some deps
 RUN apt update \
@@ -20,11 +20,11 @@ RUN curl https://rclone.org/install.sh | bash
 
 # Update the PostgreSQL client
 ENV PGVERSION=14
-RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/pgdg-archive-keyring.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/pgdg-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt update \
     && apt install -y --no-install-recommends postgresql-client-$PGVERSION \
-    && rm -f /etc/apt/sources.list.d/pgdg.list /usr/share/keyrings/pgdg-archive-keyring.gpg \
+    && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy files
