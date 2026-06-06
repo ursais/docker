@@ -1,7 +1,4 @@
-#Temporarily commment until c2c release updated python package for anthem
-#anthem
-#Install from v15 expierimental Anthem branch
-https://github.com/max3903/anthem/archive/refs/heads/patch-1.zip
+anthem
 azure-storage-blob
 boto3
 marabunta
