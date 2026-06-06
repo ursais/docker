@@ -3,9 +3,8 @@ on:
   pull_request:
 
 env:
-  APPS: "backup frepple odoo postgresql pyspy"
-  LINT_APPS: "backup odoo postgresql pyspy"
-  OS: "centos debian redhat ubuntu"
+  APPS: "backup odoo postgresql pyspy"
+  OS: "ubuntu"
   REGISTRY: ghcr.io
   DOCKER_BUILDKIT: 1
 
@@ -53,7 +52,7 @@ jobs:
       - name: "Lint Applications"
         run: |
           OLD_PWD=$(pwd)
-          for image in `find $LINT_APPS -name Dockerfile | sort -r`; do
+          for image in `find $APPS -name Dockerfile | sort -r`; do
             echo "Linting $image..."
             cd $(dirname $image)
             docker build . --file Dockerfile --check

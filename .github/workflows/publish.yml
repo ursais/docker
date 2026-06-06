@@ -7,8 +7,8 @@ on:
       - '*'
 
 env:
-  APPS: "backup frepple odoo postgresql pyspy"
-  OS: "centos debian redhat ubuntu"
+  APPS: "backup odoo postgresql pyspy"
+  OS: "ubuntu"
   REGISTRY: ghcr.io
   ORG: ${{ github.repository_owner }}
   DOCKER_BUILDKIT: 1
