@@ -40,18 +40,31 @@ jobs:
 
       - name: "Operating Systems"
         run: |
-          OLD_PWD=$(pwd)
-          for image in `find $OS -name Dockerfile | sort -r`; do
-            echo "Building $image..."
+          set -uo pipefail
+          pids=()
+          images=()
+          for image in $(find $OS -name Dockerfile | sort -r); do
+            echo "Starting build of $image..."
             DIR=$(dirname $image)
             IMAGE_ID=$(echo $DIR | sed -e 's/^\.\///g' -e 's/\//-/g')
-            cd $DIR
-            docker build . --file Dockerfile --no-cache \
-              --tag $IMAGE_ID:latest \
-              --tag ${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:latest
-            echo "Build of $image completed!"
-            cd $OLD_PWD
+            (
+              cd "$DIR"
+              docker build . --file Dockerfile --no-cache \
+                --tag "${IMAGE_ID}:latest" \
+                --tag "${{ env.REGISTRY }}/${{ env.ORG }}/${IMAGE_ID}:latest"
+              echo "Build of $image completed!"
+            ) &
+            pids+=($!)
+            images+=("$image")
           done
+          failed=0
+          for i in "${!pids[@]}"; do
+            if ! wait "${pids[$i]}"; then
+              echo "::error::Build failed for ${images[$i]}"
+              failed=1
+            fi
+          done
+          [ "$failed" -eq 0 ] || exit 1
 
       - name: "Lint Applications"
         run: |
@@ -65,19 +78,25 @@ jobs:
 
       - name: "Applications"
         run: |
-          set -euo pipefail
-          OLD_PWD=$(pwd)
-          for image in `find $APPS -name Dockerfile | sort -r`; do
-            echo "::group::Building $image"
-            cd $(dirname $image)
-            docker build . --file Dockerfile --no-cache --progress=plain 2>&1
-            STATUS=$?
-            echo "::endgroup::"
-            if [ $STATUS -ne 0 ]; then
-              echo "::error::Build failed for $image (exit $STATUS)"
-              exit $STATUS
-            fi
-            ! docker image prune -f
-            echo "Build of $image completed!"
-            cd $OLD_PWD
+          set -uo pipefail
+          pids=()
+          images=()
+          for image in $(find $APPS -name Dockerfile | sort -r); do
+            echo "Starting build of $image..."
+            (
+              cd "$(dirname $image)"
+              docker build . --file Dockerfile --no-cache --progress=plain 2>&1
+              echo "Build of $image completed!"
+            ) &
+            pids+=($!)
+            images+=("$image")
           done
+          failed=0
+          for i in "${!pids[@]}"; do
+            if ! wait "${pids[$i]}"; then
+              echo "::error::Build failed for ${images[$i]}"
+              failed=1
+            fi
+          done
+          ! docker image prune -f
+          [ "$failed" -eq 0 ] || exit 1
