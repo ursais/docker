@@ -7,14 +7,12 @@ on:
       - '*'
 
 env:
-  APPS: "backup odoo postgresql pyspy"
-  OS: "ubuntu"
   REGISTRY: ghcr.io
   ORG: ${{ github.repository_owner }}
   DOCKER_BUILDKIT: 1
 
 jobs:
-  publish:
+  publish-os:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -35,9 +33,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Operating Systems"
+        env:
+          OS: ubuntu
         run: |
           OLD_PWD=$(pwd)
-          for image in `find ${{ env.OS }} -name Dockerfile | sort -r`; do
+          for image in `find $OS -name Dockerfile | sort -r`; do
             echo "Building $image..."
             DIR=$(dirname $image)
             IMAGE_ID=$(echo $DIR | sed -e 's/^\.\///g' -e 's/\//-/g')
@@ -47,16 +47,40 @@ jobs:
               --file $image \
               --platform linux/amd64,linux/arm64 \
               --tag ${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:$VERSION \
-              --push \
-              --no-cache
+              --cache-from type=registry,ref=${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:buildcache \
+              --cache-to type=registry,ref=${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:buildcache,mode=max \
+              --push
             echo "Build of $image completed!"
             cd $OLD_PWD
           done
 
-      - name: "Applications"
+  publish-apps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        app: [backup, odoo, postgresql, pyspy]
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          submodules: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Build and push ${{ matrix.app }}"
         run: |
           OLD_PWD=$(pwd)
-          for image in `find ${{ env.APPS }} -name Dockerfile | sort -r`; do
+          for image in `find ${{ matrix.app }} -name Dockerfile | sort -r`; do
             echo "Building $image..."
             DIR=$(dirname $image)
             IMAGE_ID=$(echo $DIR | sed -e 's/^\.\///g' -e 's/\//-/g')
@@ -66,8 +90,9 @@ jobs:
               --file $image \
               --platform linux/amd64,linux/arm64 \
               --tag ${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:$VERSION \
-              --push \
-              --no-cache
+              --cache-from type=registry,ref=${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:buildcache \
+              --cache-to type=registry,ref=${{ env.REGISTRY }}/${{ env.ORG }}/$IMAGE_ID:buildcache,mode=max \
+              --push
             echo "Build of $image completed!"
             cd $OLD_PWD
           done
