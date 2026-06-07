@@ -1,0 +1,5 @@
+PostgreSQL has been deployed.
+
+To connect to the database:
+  export POD=$(kubectl get pods -l app=postgresql -o jsonpath="{.items[0].metadata.name}")
+  kubectl exec -it $POD -- psql -U {{ .Values.postgresqlUsername }} {{ .Values.defaultdb }}

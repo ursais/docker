@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-postgresql
+  labels:
+    app: {{ .Release.Name }}-postgresql
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+data:
+  POSTGRES_DB: {{ .Values.defaultdb | quote }}
+  POSTGRES_USER: {{ .Values.postgresqlUsername | quote }}

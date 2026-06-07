@@ -1,5 +1,5 @@
 FROM ubuntu:noble
-LABEL MAINTAINER="Gray Matter Logic <support@graymatterlogic.com>"
+LABEL org.opencontainers.image.authors="Gray Matter Logic <support@graymatterlogic.com>"
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
