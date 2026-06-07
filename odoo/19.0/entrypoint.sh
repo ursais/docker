@@ -23,7 +23,7 @@ set -e
 : ${PGPORT:=5432}
 : ${PGUSER:='odoo'}
 : ${PGPASSWORD:='odoo'}
-: ${PGDATABASE:='false'}
+: ${PGDATABASE:=''}
 : ${DEFAULTDB:='postgres'}
 : ${PGSSLMODE:='prefer'}
 # MARABUNTA

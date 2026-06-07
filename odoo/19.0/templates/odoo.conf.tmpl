@@ -8,7 +8,7 @@ dbfilter = {{ default "^(?!backup|defaultdb).*$" .Env.ODOO_DBFILTER }}
 db_host = {{ default "db" .Env.PGHOST }}
 db_maxconn = {{ default "64" .Env.ODOO_DB_MAXCONN }}
 db_maxconn_gevent = {{ default "64" .Env.ODOO_DB_MAXCONN_GEVENT }}
-db_name = {{ default "False" .Env.PGDATABASE }}
+db_name = {{ default "" .Env.PGDATABASE }}
 db_password = {{ default "odoo" .Env.PGPASSWORD }}
 db_port = {{ default "5432" .Env.PGPORT }}
 {{- if .Env.ODOO_DB_REPLICA_HOST }}
