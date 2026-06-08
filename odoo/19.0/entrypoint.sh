@@ -166,7 +166,7 @@ function upgrade_existing() {
   DATABASES=$(psql -X -A -t $DEFAULTDB -c "
     SELECT datname
     FROM pg_database
-    WHERE datname not in ('master', 'backup', 'latest', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'rdsadmin', 'template0', 'template1')";)
+    WHERE datname not in ('master', 'backup', 'demo', 'latest', 'postgres', 'azure_maintenance', 'azure_sys', '_dodb', 'defaultdb', 'rdsadmin', 'template0', 'template1')";)
   for DB_NAME in $DATABASES; do
     echo "Upgrading $DB_NAME"
     migrate $DB_NAME
@@ -218,6 +218,11 @@ elif [ ${MIGRATE,,} == "true" ]; then
     "test")
       upgrade_existing
       duplicate $(date -u +'%Y%m%d')
+      ;;
+    "demo")
+      sed -i -e 's/with_demo = False/with_demo = True/g' $ODOO_RC
+      create demo
+      migrate demo
       ;;
     "dev")
       drop latest
