@@ -47,7 +47,6 @@ COPY requirements.txt /odoo/
 COPY wait-for-psql.py /usr/local/bin/wait-for-psql.py
 
 # Copy Odoo addons
-COPY src/odoo-cloud-platform/monitoring_status /odoo/addons/monitoring_status
 COPY src/odoo-cloud-platform/session_redis /odoo/addons/session_redis
 
 # Expose Odoo services
