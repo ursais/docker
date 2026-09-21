@@ -1,0 +1,26 @@
+{{ if contains "aws" .Env.PLATFORM }}
+[filestore]
+type = s3
+provider = AWS
+env_auth = false
+access_key_id = {{ default "" .Env.AWS_ACCESS_KEY_ID }}
+secret_access_key = {{ default "" .Env.AWS_SECRET_ACCESS_KEY }}
+region = {{ default "" .Env.AWS_REGION }}
+location_constraint = {{ default "" .Env.AWS_REGION }}
+acl = private
+{{ end }}
+{{ if contains "azure" .Env.PLATFORM }}
+[filestore]
+type = azureblob
+sas_url = {{ default "" .Env.AZURE_STORAGE_ACCOUNT_URL }}
+{{ end }}
+{{ if contains "do" .Env.PLATFORM }}
+[filestore]
+type = s3
+provider = DigitalOcean
+env_auth = true
+access_key_id = {{ default "" .Env.AWS_ACCESS_KEY_ID }}
+secret_access_key = {{ default "" .Env.AWS_SECRET_ACCESS_KEY }}
+endpoint = {{ default "" .Env.AWS_HOST }}
+acl = private
+{{ end }}

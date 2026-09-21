@@ -34,6 +34,7 @@ as `ghcr.io/ursais/<image>:<tag>`.
 
 | Version | Image |
 |---|---|
+| 20.0 | `ghcr.io/ursais/odoo-20.0:latest` |
 | 19.0 | `ghcr.io/ursais/odoo-19.0:latest` |
 
 Base image: `ghcr.io/ursais/ubuntu-24.04:latest`
