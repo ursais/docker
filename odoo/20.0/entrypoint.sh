@@ -181,8 +181,6 @@ export MARABUNTA_DB_USER=$PGUSER
 export MARABUNTA_DB_PASSWORD=$PGPASSWORD
 export MARABUNTA_DB_PORT=$PGPORT
 export MARABUNTA_DB_HOST=$PGHOST
-# For anthem
-export ODOO_DATA_PATH=/odoo/songs/data
 
 [ "$DEBUG" == "1" ] && env | sort
 config_rclone

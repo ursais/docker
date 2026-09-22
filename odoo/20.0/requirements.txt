@@ -1,5 +1,4 @@
 click-odoo-contrib
 boto3
 marabunta
-odoo-addon-web-environment-ribbon
 openupgradelib

@@ -30,13 +30,18 @@ RUN if [ -z "${TARGETARCH}" ]; then TARGETARCH="$(dpkg --print-architecture)"; f
     && apt -y install --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* ./wkhtmltox.deb
 
-# Install Odoo
+# Install Odoo 20 from source until nightlies are published at
+# http://nightly.odoo.com/20.0/nightly/deb/
 ENV ODOO_VERSION=20.0
-ARG ODOO_RELEASE=latest
-RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
-    && apt update \
-    && apt -y install --no-install-recommends ./odoo.deb \
-    && rm -rf /var/lib/apt/lists/* odoo.deb
+ARG ODOO_SOURCE_REF=20.0
+RUN curl -sSL "https://github.com/odoo/odoo/archive/refs/heads/${ODOO_SOURCE_REF}.tar.gz" \
+      | tar -xz -C /opt \
+    && mv /opt/odoo-${ODOO_SOURCE_REF} /opt/odoo \
+    && /opt/odoo/setup/debinstall.sh \
+    && adduser --system --home /var/lib/odoo --group odoo \
+    && printf '%s\n' '#!/bin/sh' 'exec /usr/bin/python3 /opt/odoo/odoo-bin "$@"' > /usr/local/bin/odoo \
+    && chmod 0755 /usr/local/bin/odoo \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /odoo/addons /odoo/data
 
@@ -56,8 +61,9 @@ RUN pip3 install --break-system-packages -r /odoo/requirements.txt
 
 RUN chown -R odoo /odoo
 
-# Set the default config file
+# Set the default config file and make source-tree Odoo importable
 ENV ODOO_RC=/odoo/odoo.conf
+ENV PYTHONPATH=/opt/odoo
 
 VOLUME /odoo/data
 
