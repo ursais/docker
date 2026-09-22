@@ -57,6 +57,7 @@ Base image: `ghcr.io/ursais/ubuntu-24.04:latest`
 
 | Version | Image |
 |---|---|
+| 26.04 | `ghcr.io/ursais/ubuntu-26.04:latest` |
 | 24.04 | `ghcr.io/ursais/ubuntu-24.04:latest` |
 
 ## Support
