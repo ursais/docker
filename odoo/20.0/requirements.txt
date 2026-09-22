@@ -1,0 +1,4 @@
+click-odoo-contrib
+boto3
+marabunta
+openupgradelib
