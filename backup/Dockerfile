@@ -9,6 +9,7 @@ RUN apt update \
       gnupg \
       gzip \
       openssh-client \
+      pigz \
       postgresql-client \
       rclone \
       rsync \
